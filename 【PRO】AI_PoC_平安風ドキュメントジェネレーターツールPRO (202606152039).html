@@ -1,0 +1,3319 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI PoC 平安風ドキュメントジェネレーターツールPRO</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMzIiIGZpbGw9IiNmM2UxZTYiLz48cGF0aCBkPSJNMjYgMzAgQzIwIDE0LCAyNyA4LCAzMSAyNCBaIiBmaWxsPSIjN2Q5YTU5Ii8+PHBhdGggZD0iTTM4IDMwIEM0NCAxNCwgMzcgOCwgMzMgMjQgWiIgZmlsbD0iIzdkOWE1OSIvPjxlbGxpcHNlIGN4PSIzMiIgY3k9IjQwIiByeD0iMjAiIHJ5PSIxNSIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjZTFkZGU4IiBzdHJva2Utd2lkdGg9IjEuNSIvPjxjaXJjbGUgY3g9IjI1IiBjeT0iMzgiIHI9IjMiIGZpbGw9IiNjMDMwM2EiLz48Y2lyY2xlIGN4PSIzOSIgY3k9IjM4IiByPSIzIiBmaWxsPSIjYzAzMDNhIi8+PGVsbGlwc2UgY3g9IjMyIiBjeT0iNDUiIHJ4PSIyLjQiIHJ5PSIxLjgiIGZpbGw9IiNlODlhYTYiLz48L3N2Zz4=">
+<style>
+  :root{
+    /* ── 襲の色目（和色） ── */
+    --washi:#f4ecdb;        /* 生成りの料紙 */
+    --washi-2:#efe6d0;
+    --washi-line:#e0d4ba;
+    --sumi:#2b2233;         /* 濃き紫（墨） */
+    --sumi-2:#392e47;
+    --suoh:#8e3f4c;         /* 蘇芳 — 主アクセント */
+    --suoh-soft:#e7d3d3;
+    --kurenai:#b23a48;      /* 紅 — 要記入/警告 */
+    --fuji:#9583b8;         /* 藤 */
+    --futaai:#6e5e94;       /* 二藍 */
+    --moegi:#8da75b;        /* 萌黄 */
+    --yamabuki:#cf9b3b;     /* 山吹 */
+    --kobai:#c9758b;        /* 紅梅 */
+    --kin:#bfa46a;          /* 金 */
+    --aoni:#6f8a3f;
+    --slate:#6f6379;        /* 鈍色がかった紫 */
+    --slate-2:#9a8fa6;
+    --line:#d7cdb8;
+    --ok:#5f7d3a;           /* 青丹 */
+    --shadow:0 1px 0 rgba(43,34,51,.04), 0 10px 32px rgba(43,34,51,.16);
+    /* 七宝（背景文様） */
+    --shippou:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='40'%20height='40'%3E%3Cg%20fill='none'%20stroke='%23c8b6dc'%20stroke-opacity='0.07'%20stroke-width='1'%3E%3Ccircle%20cx='0'%20cy='0'%20r='20'/%3E%3Ccircle%20cx='40'%20cy='0'%20r='20'/%3E%3Ccircle%20cx='0'%20cy='40'%20r='20'/%3E%3Ccircle%20cx='40'%20cy='40'%20r='20'/%3E%3Ccircle%20cx='20'%20cy='20'%20r='20'/%3E%3C/g%3E%3C/svg%3E");
+    --kinpaku:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='200'%20height='200'%3E%3Crect%20x='20'%20y='26'%20width='5'%20height='4'%20fill='%23caa44e'%20fill-opacity='0.09'%20transform='rotate(25%2022%2028)'/%3E%3Crect%20x='120'%20y='20'%20width='5'%20height='4'%20fill='%23caa44e'%20fill-opacity='0.1'%20transform='rotate(40%20122%2022)'/%3E%3Crect%20x='60'%20y='135'%20width='5'%20height='4'%20fill='%23d8b65e'%20fill-opacity='0.08'%20transform='rotate(55%2062%20137)'/%3E%3Crect%20x='150'%20y='90'%20width='4'%20height='3'%20fill='%23d8b65e'%20fill-opacity='0.09'%20transform='rotate(15%20152%2092)'/%3E%3Crect%20x='95'%20y='110'%20width='5'%20height='4'%20fill='%23caa44e'%20fill-opacity='0.09'%20transform='rotate(-30%2098%20112)'/%3E%3Ccircle%20cx='90'%20cy='28'%20r='1.2'%20fill='%23d8b65e'%20fill-opacity='0.11'/%3E%3Ccircle%20cx='38'%20cy='70'%20r='1.0'%20fill='%23caa44e'%20fill-opacity='0.1'/%3E%3Ccircle%20cx='150'%20cy='150'%20r='1.0'%20fill='%23d8b65e'%20fill-opacity='0.09'/%3E%3Ccircle%20cx='28'%20cy='150'%20r='1.0'%20fill='%23caa44e'%20fill-opacity='0.09'/%3E%3Ccircle%20cx='170'%20cy='40'%20r='1.1'%20fill='%23d8b65e'%20fill-opacity='0.1'/%3E%3C/svg%3E");
+    --shippou-kin:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='40'%20height='40'%3E%3Cg%20fill='none'%20stroke='%23bfa46a'%20stroke-opacity='0.10'%20stroke-width='1'%3E%3Ccircle%20cx='0'%20cy='0'%20r='20'/%3E%3Ccircle%20cx='40'%20cy='0'%20r='20'/%3E%3Ccircle%20cx='0'%20cy='40'%20r='20'/%3E%3Ccircle%20cx='40'%20cy='40'%20r='20'/%3E%3Ccircle%20cx='20'%20cy='20'%20r='20'/%3E%3C/g%3E%3C/svg%3E");
+    --mono:"SFMono-Regular",ui-monospace,Menlo,Consolas,monospace;
+    --mincho:"Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP",serif;
+    --jp:"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP","Meiryo",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    font-family:var(--jp);
+    color:var(--sumi);
+    background:var(--sumi);
+    background-image:var(--kinpaku),var(--shippou);
+    background-size:150px 150px,40px 40px;
+    -webkit-font-smoothing:antialiased;
+    display:flex;flex-direction:column;height:100vh;overflow:hidden;
+  }
+
+  /* ── ヘッダ ── */
+  header{
+    flex:0 0 auto;display:flex;align-items:center;gap:16px;
+    padding:11px 20px;border-bottom:1px solid rgba(191,164,106,.28);
+    background-image:var(--kinpaku),linear-gradient(180deg,#332840,#2b2233);background-size:150px 150px,auto;
+  }
+  /* 十二単の重ね（シグネチャ） */
+  .kasane{
+    flex:0 0 auto;width:34px;height:30px;border-radius:3px;
+    border:1px solid rgba(191,164,106,.5);box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
+    background:linear-gradient(180deg,
+      #e8c6cf 0 8.33%,#d99fb0 8.33% 16.67%,#c9758b 16.67% 25%,
+      #b85a6b 25% 33.33%,#a84656 33.33% 41.67%,#8e3f4c 41.67% 50%,
+      #8a5a6a 50% 58.33%,#7e6a8e 58.33% 66.67%,#6e5e94 66.67% 75%,
+      #8576ad 75% 83.33%,#9583b8 83.33% 91.67%,#b3a6d0 91.67% 100%);
+  }
+  .brand{display:flex;align-items:baseline;gap:12px;min-width:0}
+  .brand .tag{
+    font-family:var(--mono);font-size:11px;letter-spacing:.16em;
+    color:var(--kin);border:1px solid rgba(191,164,106,.55);
+    padding:3px 8px;border-radius:3px;white-space:nowrap;
+  }
+  .brand h1{font-family:var(--mincho);font-size:17px;font-weight:600;color:#f3ecdb;margin:0;letter-spacing:.04em}
+  .brand h1 small{font-family:var(--jp);font-weight:400;color:var(--slate-2);font-size:12px;margin-left:8px}
+  header .spacer{flex:1}
+  .api-box{display:flex;align-items:center;gap:8px}
+  .api-box label{font-family:var(--mono);font-size:10px;color:var(--slate-2);letter-spacing:.1em}
+  .api-box input{
+    width:170px;font-family:var(--mono);font-size:12px;color:#f3ecdb;
+    background:rgba(255,255,255,.06);border:1px solid rgba(191,164,106,.3);
+    border-radius:5px;padding:6px 9px;
+  }
+  .api-box input:focus{outline:2px solid var(--suoh);outline-offset:-1px}
+  .api-dot{width:8px;height:8px;border-radius:50%;background:var(--slate);flex:0 0 auto}
+  .api-dot.on{background:var(--ok);box-shadow:0 0 0 3px rgba(95,125,58,.3)}
+
+  /* ── レイアウト ── */
+  main{flex:1;display:grid;grid-template-columns:380px 1fr;min-height:0}
+
+  /* ── 左: 入力 ── */
+  .controls{
+    background:#2f2640;background-image:var(--shippou);background-size:40px 40px;
+    border-right:1px solid rgba(191,164,106,.22);
+    overflow-y:auto;padding:18px 18px 80px;
+  }
+  .controls::-webkit-scrollbar{width:10px}
+  .controls::-webkit-scrollbar-thumb{background:rgba(191,164,106,.28);border-radius:6px}
+  .field{margin-bottom:18px}
+  .field > .lbl{
+    display:block;font-size:11px;letter-spacing:.12em;font-weight:600;
+    color:var(--kin);margin-bottom:7px;
+  }
+  .field input[type=text],.field textarea,.field select{
+    width:100%;font-family:var(--jp);font-size:13px;color:#f3ecdb;
+    background:rgba(255,255,255,.05);border:1px solid rgba(191,164,106,.28);
+    border-radius:7px;padding:9px 11px;resize:vertical;
+  }
+  .field textarea{min-height:62px;line-height:1.55}
+  .field input:focus,.field textarea:focus,.field select:focus{
+    outline:none;border-color:var(--suoh);background:rgba(142,63,76,.12);
+  }
+  .field select option{color:#2b2233}
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{
+    font-size:12px;color:#e4dcef;cursor:pointer;user-select:none;
+    border:1px solid rgba(191,164,106,.32);border-radius:20px;padding:6px 12px;
+    transition:.12s;
+  }
+  .chip:hover{border-color:var(--kin)}
+  .chip.on{background:var(--suoh);border-color:var(--suoh);color:#fdf6ea;font-weight:600}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+  .hint{font-size:11px;color:var(--slate-2);margin-top:6px;line-height:1.6}
+  .gen-bar{
+    position:sticky;bottom:-80px;margin:0 -18px -80px;padding:14px 18px;
+    background:linear-gradient(180deg,rgba(47,38,64,0),#2f2640 28%);
+  }
+  .btn-gen{
+    width:100%;font-family:var(--mincho);font-size:15px;font-weight:600;color:#fdf6ea;
+    background:var(--suoh);border:none;border-radius:8px;padding:13px;cursor:pointer;
+    letter-spacing:.08em;transition:.12s;box-shadow:0 6px 18px rgba(142,63,76,.4);
+  }
+  .btn-gen:hover{background:#7c3340}
+  .btn-gen:disabled{opacity:.55;cursor:wait}
+  .btn-gen .sub{display:block;font-family:var(--mono);font-size:10px;font-weight:400;opacity:.85;margin-top:3px;letter-spacing:.06em}
+
+  /* ── 右: ドキュメント ── */
+  .stage{display:flex;flex-direction:column;min-width:0;background:#241c30}
+  .tabs{
+    flex:0 0 auto;display:flex;gap:2px;padding:10px 16px 0;
+    border-bottom:1px solid rgba(191,164,106,.2);overflow-x:auto;
+  }
+  .tab{
+    font-family:var(--mono);font-size:11px;letter-spacing:.05em;white-space:nowrap;
+    color:var(--slate-2);background:transparent;border:none;cursor:pointer;
+    padding:11px 13px 9px;border-radius:7px 7px 0 0;position:relative;
+  }
+  .tab::before{content:"";position:absolute;left:8px;right:8px;top:3px;height:3px;border-radius:2px;opacity:.55}
+  .tab:nth-child(1)::before{background:var(--kobai)}
+  .tab:nth-child(2)::before{background:var(--suoh)}
+  .tab:nth-child(3)::before{background:var(--yamabuki)}
+  .tab:nth-child(4)::before{background:var(--moegi)}
+  .tab:nth-child(5)::before{background:var(--futaai)}
+  .tab:nth-child(6)::before{background:var(--fuji)}
+  .tab:nth-child(7)::before{background:#7e74ad}
+  .tab:nth-child(8)::before{background:var(--kobai)}
+  .tab:nth-child(9)::before{background:var(--suoh)}
+  .tab:nth-child(10)::before{background:var(--yamabuki)}
+  .tab:nth-child(11)::before{background:var(--moegi)}
+  .tab:nth-child(12)::before{background:var(--futaai)}
+  .tab:nth-child(13)::before{background:var(--fuji)}
+  .tab:nth-child(14)::before{background:#7e74ad}
+  .tab:nth-child(15)::before{background:var(--kobai)}
+  .tab:nth-child(16)::before{background:var(--suoh)}
+  .tab:nth-child(17)::before{background:var(--yamabuki)}
+  .tab:nth-child(18)::before{background:var(--moegi)}
+  .tab:nth-child(19)::before{background:var(--futaai)}
+  .tab:nth-child(20)::before{background:var(--fuji)}
+  .tab:nth-child(21)::before{background:var(--kobai)}
+  .tab:nth-child(22)::before{background:var(--suoh)}
+  .tab:nth-child(23)::before{background:var(--yamabuki)}
+  .tab:nth-child(24)::before{background:var(--moegi)}
+  .tab:nth-child(25)::before{background:var(--futaai)}
+  .tab:nth-child(26)::before{background:var(--fuji)}
+  .tab:nth-child(27)::before{background:var(--kobai)}
+  .tab:nth-child(28)::before{background:var(--suoh)}
+  .tab:nth-child(29)::before{background:var(--yamabuki)}
+  .tab b{display:block;font-family:var(--jp);font-size:12px;letter-spacing:.02em;margin-top:3px;color:#b6abc4}
+  .tab.on{background:var(--washi);color:var(--suoh)}
+  .tab.on::before{opacity:1}
+  .tab.on b{color:var(--sumi)}
+  .toolbar{
+    flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:9px 16px;
+    background:var(--washi);border-bottom:1px solid var(--washi-line);
+  }
+  .toolbar .docmeta{font-family:var(--mono);font-size:11px;color:var(--slate);letter-spacing:.05em}
+  .toolbar .spacer{flex:1}
+  .tbtn{
+    font-family:var(--jp);font-size:12px;color:var(--sumi);cursor:pointer;
+    background:#fffdf7;border:1px solid var(--line);border-radius:6px;padding:7px 12px;
+    display:inline-flex;align-items:center;gap:6px;transition:.12s;
+  }
+  .tbtn:hover{border-color:var(--suoh);background:#fff}
+  .tbtn.primary{background:var(--sumi);color:#fdf6ea;border-color:var(--sumi)}
+  .tbtn.primary:hover{background:var(--sumi-2)}
+  .tbtn svg{width:13px;height:13px}
+
+  .doc-scroll{flex:1;overflow-y:auto;padding:26px;background:#241c30;background-image:var(--shippou);background-size:40px 40px}
+  .sheet{
+    max-width:820px;margin:0 auto;background:var(--washi);color:var(--sumi);
+    border-radius:4px;box-shadow:var(--shadow);
+    border:1px solid var(--washi-line);
+    background-image:var(--kinpaku),var(--shippou-kin);background-size:150px 150px,40px 40px;
+    position:relative;overflow:hidden;
+  }
+  .sheet::before{
+    content:"";position:absolute;left:54px;top:0;bottom:0;width:1px;
+    background:rgba(142,63,76,.3);
+  }
+  /* 上辺の料紙ぼかし（金） */
+  .sheet::after{
+    content:"";position:absolute;left:0;right:0;top:0;height:6px;
+    background:linear-gradient(90deg,var(--kobai),var(--suoh),var(--yamabuki),var(--moegi),var(--futaai),var(--fuji));
+    opacity:.85;
+  }
+  .sheet-pad{padding:46px 48px 56px 70px;position:relative}
+
+  /* ドキュメント本文 */
+  .md h1{font-family:var(--mincho);font-size:24px;line-height:1.45;margin:0 0 4px;letter-spacing:.03em;color:var(--sumi)}
+  .md .doc-no{font-family:var(--mono);font-size:11px;color:var(--suoh);letter-spacing:.18em;margin-bottom:6px}
+  .md .doc-sub{font-family:var(--jp);font-size:13px;color:var(--slate);margin:0 0 26px;padding-bottom:18px;border-bottom:2px solid var(--sumi)}
+  .md h2{
+    font-family:var(--mincho);font-size:16px;font-weight:600;margin:30px 0 12px;padding-left:13px;position:relative;letter-spacing:.04em;color:var(--sumi);
+  }
+  .md h2::before{content:"";position:absolute;left:0;top:1px;bottom:1px;width:4px;background:var(--suoh);border-radius:2px}
+  .md h3{font-family:var(--mincho);font-size:14px;font-weight:600;margin:18px 0 8px;color:var(--futaai)}
+  .md p{font-size:13px;line-height:1.9;margin:0 0 11px;color:#3a3142}
+  .md ul,.md ol{font-size:13px;line-height:1.85;margin:0 0 12px;padding-left:22px;color:#3a3142}
+  .md li{margin-bottom:4px}
+  .md li::marker{color:var(--suoh)}
+  .md strong{color:var(--sumi);font-weight:700}
+  .md code{font-family:var(--mono);font-size:12px;background:#fffdf7;border:1px solid var(--washi-line);border-radius:4px;padding:1px 6px;color:var(--suoh)}
+  .md pre{
+    font-family:var(--mono);font-size:12px;line-height:1.65;background:#2b2233;color:#e7dcf2;
+    border-radius:7px;padding:14px 16px;overflow-x:auto;margin:0 0 14px;border:1px solid rgba(191,164,106,.25);
+  }
+  .md table{width:100%;border-collapse:collapse;font-size:12.5px;margin:0 0 16px}
+  .md th{background:var(--sumi);color:#fdf6ea;text-align:left;padding:9px 11px;font-weight:600;font-size:12px}
+  .md td{border:1px solid var(--washi-line);padding:8px 11px;vertical-align:top;color:#3a3142;background:rgba(255,253,247,.5)}
+  .md tr:nth-child(even) td{background:rgba(255,253,247,.82)}
+  .md blockquote{
+    margin:0 0 14px;padding:11px 15px;background:var(--suoh-soft);
+    border-left:4px solid var(--suoh);border-radius:0 6px 6px 0;font-size:12.5px;color:#6e2b34;
+  }
+  .md .fill{background:rgba(178,58,72,.14);border-bottom:1px dashed var(--kurenai);padding:0 3px;color:#97303c;font-weight:600}
+  .md hr{border:none;border-top:1px solid var(--washi-line);margin:24px 0}
+
+  .placeholder{
+    text-align:center;color:var(--slate-2);font-size:13px;padding:90px 30px;line-height:2;
+  }
+  .placeholder .big{font-family:var(--mono);font-size:13px;letter-spacing:.2em;color:var(--slate);margin-bottom:14px}
+  .placeholder svg{width:46px;height:46px;opacity:.4;margin-bottom:18px}
+
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--sumi);color:#fdf6ea;font-size:13px;padding:11px 20px;border-radius:8px;
+    box-shadow:0 10px 30px rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:.25s;z-index:50;
+    display:flex;align-items:center;gap:9px;border:1px solid rgba(191,164,106,.4);
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast.err{background:var(--suoh)}
+
+  .ai-status{font-family:var(--mono);font-size:11px;color:var(--slate);display:none;align-items:center;gap:8px}
+  .ai-status.show{display:flex}
+  .spin{width:12px;height:12px;border:2px solid var(--line);border-top-color:var(--suoh);border-radius:50%;animation:sp .7s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+
+  @media (max-width:880px){
+    main{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+    .controls{max-height:42vh}
+    .api-box input{width:120px}
+    .brand h1 small{display:none}
+  }
+  /* ── PRO: メニュー / 一式 / 木札 / 印刷一式 ── */
+  .menu{position:relative}
+  .menu-pop{
+    position:absolute;right:0;top:calc(100% + 6px);min-width:212px;z-index:40;
+    background:#fffdf7;border:1px solid var(--line);border-radius:9px;
+    box-shadow:0 14px 36px rgba(43,34,51,.24);padding:6px;display:none;
+  }
+  .menu.open .menu-pop{display:block}
+  .menu-pop .mi{
+    display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+    font-family:var(--jp);font-size:12.5px;color:var(--sumi);background:none;border:none;
+    padding:9px 11px;border-radius:6px;cursor:pointer;white-space:nowrap;
+  }
+  .menu-pop .mi:hover{background:var(--suoh-soft)}
+  .menu-pop .mi b{font-weight:700}
+  .menu-pop .mi .ext{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--slate-2);letter-spacing:.05em}
+  .menu-pop .mi .sw{width:9px;height:9px;border-radius:2px;flex:0 0 auto}
+  .menu-pop .sep{height:1px;background:var(--washi-line);margin:5px 7px}
+  .tbtn.gold{background:linear-gradient(180deg,#caa867,#b8954f);color:#3a2a12;border-color:#a07e3c;font-weight:700}
+  .tbtn.gold:hover{background:linear-gradient(180deg,#d2b275,#be9b55)}
+  .tbtn .caret{width:10px;height:10px;opacity:.7}
+
+  /* 木札ボタン */
+  .kifuda-btn{position:relative;flex:0 0 auto;cursor:pointer;border:none;background:none;padding:0;margin-right:4px}
+  .kifuda{
+    display:inline-block;font-family:var(--mincho);font-weight:600;letter-spacing:.12em;color:#3a2a16;
+    background:
+      repeating-linear-gradient(90deg,rgba(90,60,30,.10) 0 2px,rgba(90,60,30,0) 2px 7px),
+      linear-gradient(180deg,#cba268,#b07f44);
+    border:1px solid #7c5a30;border-radius:5px;padding:7px 13px 7px 24px;font-size:12px;
+    box-shadow:0 2px 5px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.25);position:relative;
+  }
+  .kifuda::before{content:"";position:absolute;left:9px;top:50%;transform:translateY(-50%);width:6px;height:6px;border-radius:50%;background:#3a2a16;box-shadow:inset 0 0 0 1px rgba(255,255,255,.2)}
+  .kifuda-btn .string{position:absolute;left:12px;top:-7px;width:1px;height:8px;background:#9c7a48}
+  .kifuda-btn:hover .kifuda{filter:brightness(1.05)}
+
+  /* 木札オーバーレイ */
+  .kifuda-ov{position:fixed;inset:0;z-index:60;display:none;align-items:flex-start;justify-content:center;background:rgba(20,14,28,.55);backdrop-filter:blur(2px);overflow-y:auto;padding:40px 16px}
+  .kifuda-ov.open{display:flex}
+  .fuda{
+    position:relative;max-width:560px;width:100%;margin-top:14px;color:#2e2013;
+    background:
+      var(--kinpaku),
+      repeating-linear-gradient(91deg,rgba(80,52,24,.07) 0 3px,rgba(80,52,24,0) 3px 9px),
+      linear-gradient(180deg,#e7c994,#d4ad6f 12%,#caa066 88%,#bb914f);
+    background-size:150px 150px,auto,auto;
+    border:2px solid #8a6334;border-radius:14px 14px 12px 12px;
+    box-shadow:0 24px 60px rgba(0,0,0,.45),inset 0 2px 0 rgba(255,255,255,.3);
+    padding:30px 30px 26px;
+  }
+  .fuda .hole{position:absolute;top:9px;left:50%;transform:translateX(-50%);width:13px;height:13px;border-radius:50%;background:#241a0e;box-shadow:inset 0 1px 2px rgba(0,0,0,.6),0 1px 0 rgba(255,255,255,.25)}
+  .fuda h2{font-family:var(--mincho);font-size:21px;margin:16px 0 4px;text-align:center;letter-spacing:.3em;color:#3a2810}
+  .fuda .sub2{text-align:center;font-size:12px;color:#5b4424;margin-bottom:18px;font-family:var(--jp)}
+  .fuda h3{font-family:var(--mincho);font-size:14px;margin:18px 0 9px;color:#4a3416;border-bottom:1px solid rgba(90,60,30,.4);padding-bottom:5px;letter-spacing:.06em}
+  .fuda ol{margin:0 0 8px;padding-left:20px;font-size:13px;line-height:1.95;color:#3a2c18}
+  .fuda ul{margin:0 0 8px;padding-left:18px;font-size:12.5px;line-height:1.9;color:#46341c}
+  .fuda li{margin-bottom:3px}
+  .fuda li::marker{color:#8a3f2a}
+  .fuda b{color:#6e2b1a}
+  .fuda .fmt{display:flex;gap:10px;align-items:flex-start;font-size:12.5px;margin:7px 0;line-height:1.7;color:#3a2c18}
+  .fuda .fmt .badge{font-family:var(--mono);font-size:10px;font-weight:700;color:#fdf6ea;background:#7c5a30;border-radius:4px;padding:2px 7px;flex:0 0 auto;margin-top:1px;letter-spacing:.04em;min-width:34px;text-align:center}
+  .fuda .close{position:absolute;top:12px;right:14px;border:none;background:rgba(46,32,16,.14);color:#3a2810;font-size:13px;border-radius:50%;width:28px;height:28px;cursor:pointer}
+  .fuda .close:hover{background:rgba(46,32,16,.28)}
+  .fuda .note{margin-top:16px;background:rgba(255,255,255,.4);border:1px dashed #8a6334;border-radius:8px;padding:11px 13px;font-size:12px;line-height:1.78;color:#4a3416}
+
+  /* 印刷一式 */
+  #printAll{display:none}
+  @media print{
+    body.printing-all main{display:none}
+    body.printing-all #printAll{display:block}
+    #printAll .print-sheet{box-shadow:none;border:none;max-width:none;background-image:none;page-break-after:always;border-radius:0}
+    #printAll .print-sheet:last-child{page-break-after:auto}
+    .kifuda-ov,.kifuda-btn,.hotaru-btn,.hotaru-panel,.draft-bar,.rv-panel{display:none!important}
+  }
+
+  .draft-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:-2px 0 16px;padding:8px 9px;background:rgba(255,255,255,.05);border:1px solid rgba(191,164,106,.28);border-radius:8px}
+  .draft-bar .draft-status{flex:1 1 100%;font-size:10.5px;color:var(--kin);font-family:var(--mono);letter-spacing:.03em}
+  .draft-bar button,.draft-bar .imp{font-family:var(--jp);font-size:11px;color:#e4dcef;background:rgba(255,255,255,.06);border:1px solid rgba(191,164,106,.3);border-radius:6px;padding:5px 9px;cursor:pointer}
+  .draft-bar button:hover,.draft-bar .imp:hover{border-color:var(--kin)}
+  .hotaru-btn{position:fixed;right:18px;bottom:18px;z-index:55;width:46px;height:46px;border-radius:50%;border:1px solid rgba(191,164,106,.5);background:radial-gradient(circle at 50% 42%,#2b2233,#171120);cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center}
+  .hotaru-btn .glow{width:10px;height:10px;border-radius:50%;background:#cfe08a;box-shadow:0 0 5px 1px rgba(186,214,110,.6)}
+  .hotaru-btn.lit .glow{animation:hotaru 1.6s ease-in-out infinite}
+  @keyframes hotaru{0%,100%{opacity:.4;box-shadow:0 0 4px 1px rgba(186,214,110,.4)}50%{opacity:1;box-shadow:0 0 13px 5px rgba(207,224,138,.9)}}
+  .hotaru-count{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;border-radius:9px;background:var(--suoh);color:#fff;font-size:10px;font-family:var(--mono);display:none;align-items:center;justify-content:center;padding:0 4px}
+  .hotaru-panel{position:fixed;right:18px;bottom:74px;z-index:56;width:min(440px,92vw);max-height:62vh;display:none;flex-direction:column;background:linear-gradient(180deg,#241c30,#1a1424);border:1px solid rgba(191,164,106,.45);border-radius:12px;box-shadow:0 18px 50px rgba(0,0,0,.55);overflow:hidden}
+  .hotaru-panel.open{display:flex}
+  .hotaru-head{display:flex;align-items:center;gap:6px;padding:11px 14px;border-bottom:1px solid rgba(191,164,106,.25);color:#eadfa0;font-family:var(--mincho);letter-spacing:.1em;font-size:14px}
+  .hotaru-head .sp{flex:1}
+  .hotaru-head button{font-family:var(--jp);font-size:11px;color:#eadfa0;background:rgba(255,255,255,.06);border:1px solid rgba(191,164,106,.35);border-radius:6px;padding:5px 9px;cursor:pointer}
+  .hotaru-head button:hover{background:rgba(255,255,255,.12)}
+  .hotaru-list{overflow-y:auto;padding:8px 10px;font-size:12px}
+  .hotaru-row{display:flex;gap:8px;align-items:flex-start;padding:6px 4px;border-bottom:1px dashed rgba(191,164,106,.15);color:#c8c0d4;line-height:1.55}
+  .hotaru-row .hb{color:#cfe08a;text-shadow:0 0 5px rgba(186,214,110,.85);flex:0 0 auto}
+  .hotaru-row.err .hb{color:#ef9a8e;text-shadow:0 0 6px rgba(214,73,47,.85)}
+  .hotaru-row .ht{font-family:var(--mono);color:#8a7fa0;flex:0 0 auto}
+  .hotaru-row .hm{word-break:break-word}
+  .hotaru-empty{color:#8a7fa0;text-align:center;padding:26px 16px;font-size:12px;line-height:1.7}
+  .rv-panel{background:linear-gradient(180deg,rgba(142,63,76,.06),rgba(255,255,255,0));border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:0 0 22px}
+  .rv-title{font-family:var(--mincho);font-size:17px;color:var(--sumi);letter-spacing:.04em;margin-bottom:8px}
+  .rv-title .rv-sub{font-family:var(--jp);font-size:11px;color:var(--kin);margin-left:8px}
+  .rv-warn{background:rgba(178,58,72,.08);border:1px solid rgba(178,58,72,.3);color:#7a2f3a;border-radius:8px;padding:8px 10px;font-size:12px;line-height:1.6;margin-bottom:12px}
+  .rv-row{display:flex;align-items:center;gap:8px;margin-bottom:9px;flex-wrap:wrap}
+  .rv-row label{flex:0 0 84px;font-size:12px;color:var(--sumi);font-weight:600}
+  .rv-row select,.rv-row input[type=text]{flex:1;min-width:160px;padding:7px 9px;border:1px solid var(--line);border-radius:7px;font-family:var(--jp);font-size:13px;background:#fff}
+  .rv-text{width:100%;min-height:140px;resize:vertical;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-family:var(--mono);font-size:12.5px;line-height:1.6;background:#fff;margin-bottom:6px;box-sizing:border-box}
+  .rv-notes{width:100%;min-height:64px;resize:vertical;padding:9px 12px;border:1px solid var(--line);border-radius:8px;font-family:var(--jp);font-size:12.5px;line-height:1.6;background:#fff;margin-bottom:6px;box-sizing:border-box}
+  .rv-sub2{font-size:11.5px;color:var(--suoh);font-family:var(--mincho);letter-spacing:.04em;margin:10px 0 6px}
+  .rv-checks{display:flex;flex-direction:column;gap:5px;margin-bottom:6px}
+  .rv-chkitem{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;line-height:1.5;color:var(--sumi);cursor:pointer}
+  .rv-sec{display:flex;flex-direction:column;gap:6px;background:rgba(191,164,106,.08);border:1px dashed rgba(191,164,106,.5);border-radius:8px;padding:10px 12px;margin-bottom:12px}
+  .rv-sec label{display:flex;gap:8px;align-items:flex-start;font-size:12px;line-height:1.55;color:var(--sumi);cursor:pointer}
+  .rv-sec input{margin-top:2px}
+  .rv-actions{display:flex;align-items:center;gap:10px;margin-bottom:4px;flex-wrap:wrap}
+  .rv-run{background:var(--suoh);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-family:var(--jp);font-size:13.5px;cursor:pointer;letter-spacing:.04em}
+  .rv-run:disabled{background:#c7bfb0;cursor:not-allowed}
+  .rv-run:not(:disabled):hover{filter:brightness(1.08)}
+  .rv-hint{font-size:11px;color:var(--kin);font-family:var(--mono)}
+  .rv-btn2{background:#fff;border:1px solid var(--line);border-radius:7px;padding:7px 12px;font-family:var(--jp);font-size:12px;cursor:pointer;color:var(--sumi)}
+  .rv-btn2:hover{border-color:var(--kin)}
+  .rv-btn2:disabled{opacity:.5;cursor:not-allowed}
+  .rv-refine{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--sumi);margin:2px 0;cursor:pointer}
+  .rv-opts{display:flex;flex-direction:column;gap:4px;margin:4px 0 10px}
+  .rv-weight{padding:5px 6px;border:1px solid var(--line);border-radius:6px;background:#fff;font-family:var(--mono)}
+  .rv-alert{background:rgba(178,58,72,.1);border:1px solid rgba(178,58,72,.4);color:#7a2f3a;border-radius:8px;padding:8px 10px;font-size:12.5px;margin-bottom:8px}
+  .rv-note{font-size:11.5px;color:var(--kin);margin:6px 0;line-height:1.6}
+  .rv-diff-t{border-collapse:collapse;width:100%;margin:4px 0 6px;font-size:12px}
+  .rv-diff-t th,.rv-diff-t td{border:1px solid var(--line);padding:4px 8px;text-align:center}
+  .rv-diff-t th{background:rgba(191,164,106,.12);font-family:var(--mincho)}
+  .rv-diff-t .rv-flag{background:rgba(178,58,72,.08);font-weight:600}
+  .rv-cfgbar{margin:2px 0 8px}
+  .rv-cfgbox{border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:12px;background:rgba(191,164,106,.06)}
+  .rv-cfgrow{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin-bottom:8px}
+  .rv-cfgrow>label{font-size:12px;color:var(--sumi)}
+  .rv-cfgrow select,.rv-cfgrow input[type=number]{padding:5px 7px;border:1px solid var(--line);border-radius:6px;font-family:var(--mono);font-size:12px;background:#fff}
+  .rv-cfgrow input[type=number]{width:60px}
+  .rv-cfgbtns{margin-top:2px}
+  .rv-imp{cursor:pointer;display:inline-flex;align-items:center}
+  .rv-dial{display:inline-flex;align-items:center;gap:6px}
+  .rv-dbtn{width:26px;height:26px;border:1px solid var(--line);border-radius:50%;background:#fff;cursor:pointer;font-size:14px;line-height:1;color:var(--suoh)}
+  .rv-dbtn:hover{border-color:var(--kin);background:rgba(191,164,106,.1)}
+  .rv-dial-v{min-width:18px;text-align:center;font-family:var(--mincho);font-size:15px;color:var(--sumi)}
+  .yuki-usagi{display:none;margin-left:9px;opacity:.58;vertical-align:middle;line-height:1;filter:drop-shadow(0 1px 1px rgba(0,0,0,.12))}
+  .yuki-usagi{cursor:pointer}
+  .yuki-usagi.show{display:inline-block;transform-origin:50% 100%;animation:yukiIn 1.1s ease, usagiHop 2.8s ease-in-out 1.1s infinite}
+  .yuki-usagi.show.boing{animation:usagiBoing .6s ease}
+  @keyframes usagiHop{
+    0%{transform:translateY(0) rotate(0)}
+    8%{transform:translateY(-6px) rotate(-5deg) scaleY(1.05)}
+    16%{transform:translateY(0) scaleY(.94)}
+    22%{transform:translateY(-3px) rotate(4deg)}
+    28%{transform:translateY(0) scaleY(1)}
+    33%{transform:translateX(3px)}
+    38%{transform:translateX(0)}
+    62%{transform:translateY(0)}
+    70%{transform:translateY(-8px) scaleY(1.06)}
+    78%{transform:translateY(0) scaleY(.93)}
+    84%{transform:translateY(-2px)}
+    90%,100%{transform:translateY(0) scaleY(1)}
+  }
+  @keyframes usagiBoing{
+    0%{transform:translateY(0) scaleY(1)}
+    25%{transform:translateY(-13px) rotate(-8deg) scaleY(1.12)}
+    55%{transform:translateY(0) scaleY(.85)}
+    75%{transform:translateY(-5px) scaleY(1.04)}
+    100%{transform:translateY(0) scaleY(1)}
+  }
+  @keyframes yukiIn{from{opacity:0;transform:translateY(-4px)}to{opacity:.58;transform:none}}
+  .rv-scoreRow{display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap}
+  .rv-scoreName{flex:1 1 200px;font-size:12.5px;color:var(--sumi)}
+  .rv-score{flex:0 0 56px;padding:5px 6px;border:1px solid var(--line);border-radius:6px;background:#fff;font-family:var(--mono)}
+  .rv-reason{flex:2 1 180px;min-width:130px;padding:6px 9px;border:1px solid var(--line);border-radius:6px;font-family:var(--jp);font-size:12px;background:#fff}
+  .rv-scoreBox{background:rgba(191,164,106,.07);border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:8px 0 12px}
+  .rv-scoreTop{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--sumi);margin-bottom:8px;flex-wrap:wrap}
+  .rv-scoreTop b{font-size:18px;color:var(--suoh);font-family:var(--mincho)}
+  .rv-lvl{background:var(--suoh);color:#fff;border-radius:10px;padding:2px 10px;font-size:11px}
+  .rv-bar{flex:1 1 120px;height:8px;background:rgba(0,0,0,.08);border-radius:4px;overflow:hidden;min-width:100px}
+  .rv-bar span{display:block;height:100%;background:linear-gradient(90deg,var(--kin),var(--suoh))}
+  .rv-fbk{margin-top:8px}
+  .rv-fbk-h{font-size:11.5px;color:var(--suoh);font-family:var(--mincho);letter-spacing:.04em;margin-bottom:3px}
+  .rv-fbk ul{margin:0;padding-left:18px}
+  .rv-fbk li{font-size:12px;line-height:1.55;color:var(--sumi);margin-bottom:3px}
+  .rv-result{border-top:1px dashed var(--line);margin-top:12px;padding-top:10px}
+  .rv-empty{color:#9b8f7e;font-size:12px;text-align:center;padding:16px;line-height:1.6}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden;margin-right:4px;background:#fffdf7}
+  .seg-b{font-family:var(--jp);font-size:11.5px;color:var(--slate);background:transparent;border:none;padding:7px 11px;cursor:pointer;white-space:nowrap}
+  .seg-b.on{background:var(--futaai);color:#fff;font-weight:700}
+  .seg-b:not(.on):hover{background:var(--suoh-soft)}
+  @media print{
+    body{background:#fff;display:block;height:auto;overflow:visible}
+    header,.controls,.tabs,.toolbar{display:none!important}
+    main{display:block}
+    .doc-scroll{overflow:visible;padding:0;background:#fff;background-image:none}
+    .sheet{box-shadow:none;border:none;max-width:none;background-image:none}
+  }
+</style>
+</head>
+<body>
+<div class="junihitoe" aria-hidden="true"></div>
+
+<header>
+  <div class="kasane" title="十二単 / 襲の色目" aria-hidden="true"></div>
+  <div class="brand">
+    <span class="tag">PRO ・ 襲色目</span><span class="yuki-usagi" id="yukiUsagi" title="ぴょこぴょこ（クリックで跳ねる）" onclick="usagiBoing()" role="img" aria-label="雪見うさぎ"><svg viewBox="0 0 40 32" width="34" height="27"><path d="M16 12 C12 4, 16 1, 19 9 Z" fill="#7d9a59"/><path d="M24 12 C28 4, 24 1, 21 9 Z" fill="#7d9a59"/><ellipse cx="20" cy="22" rx="13" ry="8.5" fill="#fdfdff"/><ellipse cx="20" cy="22" rx="13" ry="8.5" fill="none" stroke="#e1dde8" stroke-width="0.8"/><circle cx="16" cy="21" r="1.6" fill="#c0303a"/><circle cx="24" cy="21" r="1.6" fill="#c0303a"/></svg></span>
+    <h1>AI PoC 平安風ドキュメントジェネレーターツールPRO <small>企画 → 技術設計 → 評価設計を一気通貫で</small></h1>
+  </div>
+  <div class="spacer"></div>
+  <button class="kifuda-btn" onclick="toggleKifuda(true)" title="使い方"><span class="string"></span><span class="kifuda">使い方</span></button>
+  <div class="api-box">
+    <span class="api-dot" id="apiDot" title="API未接続（オフライン生成）"></span>
+    <label for="apiKey">ANTHROPIC&nbsp;KEY（任意）</label>
+    <input id="apiKey" type="password" placeholder="sk-ant-... 未入力でも動作" autocomplete="off">
+  </div>
+</header>
+
+<main>
+  <!-- ── 入力パネル ── -->
+  <section class="controls">
+    <div class="draft-bar">
+      <span class="draft-status" id="draftStatus">下書き: 未保存</span>
+      <button onclick="saveDraft(true)" title="ブラウザに一次保存">保存</button>
+      <button onclick="restoreDraftFromStore()" title="保存した下書きを復元">復元</button>
+      <button onclick="exportDraftJson()" title="下書きをJSONで書き出し">書出</button>
+      <label class="imp" title="JSON下書きを読み込み">読込<input type="file" id="draftFile" accept="application/json" onchange="importDraftJson(event)" hidden></label>
+      <button onclick="clearDraft()" title="保存した下書きを消去">消去</button>
+      <button onclick="resetAll()" title="すべて初期化（高機能リセット）">リセット</button>
+    </div>
+    <div class="field">
+      <span class="lbl">案件名 / Project</span>
+      <input id="f_project" type="text" placeholder="例）製造業ナレッジ検索 RAG PoC">
+    </div>
+    <div class="field">
+      <span class="lbl">クライアント業種</span>
+      <input id="f_client" type="text" placeholder="例）精密機器メーカー（従業員1,200名）">
+    </div>
+
+    <div class="field">
+      <span class="lbl">課題カテゴリ（1つ）</span>
+      <div class="chips" id="c_category"></div>
+    </div>
+
+    <div class="field">
+      <span class="lbl">対象データ（複数可）</span>
+      <div class="chips" id="c_data"></div>
+    </div>
+
+    <div class="field">
+      <span class="lbl">AI機能（複数可）</span>
+      <div class="chips" id="c_feature"></div>
+    </div>
+
+    <div class="field">
+      <span class="lbl">解決したい業務課題（自由記述・任意）</span>
+      <textarea id="f_pain" placeholder="例）熟練者しか分からない図面の読み解きが属人化しており、若手の問い合わせ対応に時間がかかる"></textarea>
+    </div>
+
+    <div class="row2">
+      <div class="field">
+        <span class="lbl">PoC期間</span>
+        <select id="f_term">
+          <option>4週間</option><option selected>8週間</option>
+          <option>12週間</option><option>16週間</option>
+        </select>
+      </div>
+      <div class="field">
+        <span class="lbl">精度目標</span>
+        <select id="f_acc">
+          <option>正答率 70%以上</option>
+          <option selected>正答率 80%以上</option>
+          <option>正答率 90%以上</option>
+          <option>定性評価のみ</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="lbl">想定LLM / 基盤</span>
+      <input id="f_llm" type="text" value="Claude / GPT 系 + 自社VPC内ベクタDB" >
+    </div>
+
+    <div class="hint">
+      未入力の項目は <span style="color:var(--kurenai)">朱のハイライト</span> で「要記入」として出力します。叩き台前提なので、誇張せず空欄を残す設計です。
+    </div>
+
+    <div class="gen-bar">
+      <button class="btn-gen" id="btnGen" onclick="generate()">
+        ドキュメントを生成
+        <span class="sub" id="genSub">OFFLINE MODE — テンプレ生成</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ── ドキュメント ── -->
+  <section class="stage">
+    <nav class="tabs" id="tabs"></nav>
+    <div class="toolbar">
+      <span class="docmeta" id="docMeta">— ドキュメント未生成 —</span>
+      <span class="ai-status" id="aiStatus"><span class="spin"></span><span id="aiStatusTxt">AIで具体化中…</span></span>
+      <span class="spacer"></span>
+      <div class="seg" id="modeSeg" title="出力の中身を切り替え"><button class="seg-b on" data-m="filled" onclick="setMode('filled')">記入済み</button><button class="seg-b" data-m="blank" onclick="setMode('blank')">白紙ひな型</button></div>
+      <div class="menu" id="menuOne">
+        <button class="tbtn" onclick="toggleMenu('menuOne')" title="表示中の章を保存">
+          この章を保存
+          <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="menu-pop">
+          <button class="mi" onclick="exportOne('md')"><span class="sw" style="background:var(--futaai)"></span>Markdown<span class="ext">.md</span></button>
+          <button class="mi" onclick="exportOne('txt')"><span class="sw" style="background:var(--moegi)"></span>メモ（テキスト）<span class="ext">.txt</span></button>
+          <button class="mi" onclick="exportOne('csv')"><span class="sw" style="background:var(--yamabuki)"></span>CSV（表）<span class="ext">.csv</span></button>
+          <button class="mi" onclick="exportOne('xlsx')"><span class="sw" style="background:var(--aoni)"></span>Excel（表）<span class="ext">.xlsx</span></button>
+          <button class="mi" onclick="exportOne('docx')"><span class="sw" style="background:#2b579a"></span>Word（書式付き）<span class="ext">.docx</span></button>
+          <div class="sep"></div>
+          <button class="mi" onclick="copyMd()"><span class="sw" style="background:var(--fuji)"></span>Markdownをコピー<span class="ext">copy</span></button>
+        </div>
+      </div>
+      <button class="tbtn" onclick="exportOne('csv')" title="この章の表をCSVで保存">CSV</button>
+      <button class="tbtn" onclick="printDoc('one')" title="この章をPDF（印刷）">PDF</button>
+      <div class="menu" id="menuAll">
+        <button class="tbtn gold" onclick="toggleMenu('menuAll')" title="6章すべてを一括ダウンロード">
+          一式ダウンロード
+          <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="menu-pop">
+          <button class="mi" onclick="exportAllZip()"><span class="sw" style="background:var(--suoh)"></span><b>ZIP一式</b>（全形式まとめて）<span class="ext">.zip</span></button>
+          <div class="sep"></div>
+          <button class="mi" onclick="exportAll('md')"><span class="sw" style="background:var(--futaai)"></span>全章 Markdown<span class="ext">.md</span></button>
+          <button class="mi" onclick="exportAll('txt')"><span class="sw" style="background:var(--moegi)"></span>全章 メモ<span class="ext">.txt</span></button>
+          <button class="mi" onclick="exportAll('csv')"><span class="sw" style="background:var(--yamabuki)"></span>全表 CSV<span class="ext">.csv</span></button>
+          <button class="mi" onclick="exportAll('xlsx')"><span class="sw" style="background:var(--aoni)"></span>全表 Excel（章別シート）<span class="ext">.xlsx</span></button>
+          <button class="mi" onclick="exportAll('docx')"><span class="sw" style="background:#2b579a"></span>全章 Word（書式付き）<span class="ext">.docx</span></button>
+          <button class="mi" onclick="printDoc('all')"><span class="sw" style="background:var(--kobai)"></span>全章 PDF（印刷）<span class="ext">print</span></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="doc-scroll">
+      <div class="sheet">
+        <div class="sheet-pad">
+          <div class="md" id="docBody">
+            <div class="placeholder">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>
+              <div class="big">白紙の料紙</div>
+              左で案件条件を選んで<br><b>「ドキュメントを生成」</b>を押してください。<br>
+              会議用資料を含む各種ドキュメントが束で出力されます。
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- 使い方 木札 -->
+<div class="kifuda-ov" id="kifudaOv" onclick="if(event.target===this)toggleKifuda(false)">
+  <div class="fuda">
+    <span class="hole"></span>
+    <button class="close" onclick="toggleKifuda(false)" title="閉じる">✕</button>
+    <h2>使 い 方</h2>
+    <div class="sub2">AI PoC 平安風ドキュメントジェネレーターツールPRO</div>
+
+    <h3>三手で一式</h3>
+    <ol>
+      <li>左の帳面で<b>案件条件</b>を選ぶ（課題カテゴリ・対象データ・AI機能ほか）。</li>
+      <li><b>「ドキュメントを生成」</b>を押すと、企画から会議用資料までの<b>各章</b>が一度に出ます。</li>
+      <li>右上から<b>各章</b>または<b>一式</b>で書き出し。タブで章を切り替え。</li>
+    </ol>
+
+    <h3>書き出せる形</h3>
+    <div class="fmt"><span class="badge">MD</span><span>Markdown。そのままQiita / Notion / GitHubへ。</span></div>
+    <div class="fmt"><span class="badge">TXT</span><span>メモ（プレーンテキスト）。メールや議事録に貼りやすい体裁。</span></div>
+    <div class="fmt"><span class="badge">CSV</span><span>各章の表だけを抽出（BOM付きでExcelの文字化けなし）。</span></div>
+    <div class="fmt"><span class="badge">XLSX</span><span>Excelブック。章ごとにシート分割（追加ソフト不要・自前生成）。</span></div>
+    <div class="fmt"><span class="badge">DOCX</span><span>Word文書。見出し・表・箇条書き・目次対応の書式付き（自前生成）。</span></div>
+    <div class="fmt"><span class="badge">PDF</span><span>印刷ダイアログから「PDFで保存」。和柄は外れ清書版で出ます。</span></div>
+    <div class="fmt"><span class="badge">ZIP</span><span>一式＝md / txt / csv ＋ 全表xlsx ＋ 全文md ＋ 説明書を一括。</span></div>
+
+    <h3>こころえ</h3>
+    <ul>
+      <li><b>《赤字》は要記入</b>。叩き台ゆえ、合意のうえ必ず埋める。</li>
+      <li><b>APIは任意</b>。ヘッダにキーを入れると各章をAIで具体化、無くてもオフラインで完動。</li>
+      <li>客先デモはオフラインが無難（キーをネットに乗せない）。</li>
+      <li>上の<b>「白紙ひな型」</b>に切り替えると、記入用の空欄で書き出せます（会議でそのまま記入可）。</li>
+      <li>Wordは<b>表紙・目次・ページ番号・案件名</b>入り。目次は開いて<b>F9</b>で反映。</li>
+      <li>各章の冒頭に <b>WHY → WHAT → HOW</b> の記入欄。芯を一行で固めてから埋めると速いです。</li>
+      <li><b>一次保存</b>：左上のバーで自動保存・復元、JSON書出/読込も可。</li>
+      <li>不具合は右下の<b>蛍火（ほたるび）ログ</b>に記録。コピーして共有できます。</li>
+      <li><b>JSON入出力</b>：下書きバーの「書出/読込」で、状態を丸ごと保存・受け渡し。</li>
+      <li><b>リセット</b>：下書きバーの「リセット」で、入力・選択・生成を初期状態へ（確認あり）。</li>
+      <li><b>WBS（第二十）</b>はExcelで「遅れ」「状態」を自動計算。担当に「自分」で行に色、遅延は毎日ログに理由を記録。</li>
+    </ul>
+
+    <h3>各タブの使い方</h3>
+    <ul class="tabguide">
+      <li><b>第一 PoC企画書</b>：目的・進め方・体制を一枚に</li>
+      <li><b>第二 要件定義書</b>：できること／できないことの線引き</li>
+      <li><b>第三 アーキテクチャ仕様書</b>：全体構造と非機能方針</li>
+      <li><b>第四 技術アーキテクチャ設計</b>：構成・データの流れ・技術</li>
+      <li><b>第五 詳細設計書</b>：内部処理・データ構造・内部API</li>
+      <li><b>第六 実装仕様書</b>：言語・構成・規約・環境変数</li>
+      <li><b>第七 データフロー仕様書</b>：源泉〜保管と機微情報の扱い</li>
+      <li><b>第八 プロンプト設計シート</b>：役割／制約／出力形式</li>
+      <li><b>第九 テスト仕様書</b>：テスト種別・ケース・合否</li>
+      <li><b>第十 評価・検証計画書</b>：精度の測り方と合格ライン</li>
+      <li><b>第十一 運用設計書</b>：体制・監視・障害対応・更新</li>
+      <li><b>第十二 お客様用手順書</b>：やさしい言葉で操作案内</li>
+      <li><b>第十三 リスク・前提条件</b>：想定と備え</li>
+      <li><b>第十四 会議用資料</b>：成功／失敗の線引き・お取り決め</li>
+      <li><b>第十五 勉強会・研修資料</b>：カリキュラムと参考文献</li>
+      <li><b>第十六 顧客折衝ポイント</b>：揉めない和風言い換え</li>
+      <li><b>第十七 実務やまと言葉</b>：漢語→やまと言葉の言い換え帳</li>
+      <li><b>第十八 文書作法・参考資料</b>：公式手引・論文・規格</li>
+      <li><b>第十九 AI生産性データ分析</b>：指標・効果測定・ROI</li>
+      <li><b>第二十 WBS（Excel時短）</b>：予定／実績／遅れを自動計算</li>
+      <li><b>第二十一 新人サポート・お任せ</b>：3信号で得意/不得意とお任せを管理</li>
+      <li><b>第二十二 上位指示メモ・会議</b>：5W1Hと朝/中間/夕会・一人MTG</li>
+      <li><b>第二十三 業界用語辞典</b>：用語をExcelで辞典化</li>
+      <li><b>第二十四 AI設計書レビュー</b>：観点を採点→カイゼン＋参考記事。AI実行はアーティファクトは☑だけ／単体はキー</li>
+      <li><b>第二十五 学びの教室</b>：文系向け実務学習。エージェント/プロンプト/ハーネス/データ分析を公式・論文・READMEで（クライアント教室つき）</li>
+      <li><b>第二十六 FB記録</b>：フィードバックをExcel台帳に（区分で並べ替え）</li>
+      <li><b>第二十七 顧客MTG記録</b>：決定・宿題をExcelで台帳化</li>
+      <li><b>第二十八 和風カンバン</b>：作業札をレーンで管理（Excelで並べ替え＝簡易ボード）</li>
+      <li><b>第二十九 カイゼンMTG</b>：事実→原因→対策→KPTで仕組みを直す</li>
+    </ul>
+
+    <div class="note">うまく落とせない時は、この道具を <b>.htmlとして保存し、ブラウザで直接開く</b> と確実です（ネット接続不要）。アプリ内プレビューはダウンロードが制限される場合があります。</div>
+  </div>
+</div>
+
+<div id="printAll"></div>
+<button class="hotaru-btn" id="hotaruBtn" onclick="openHotaru()" title="蛍火（ほたるび）ログ：不具合の記録">
+  <span class="glow"></span><span class="hotaru-count" id="hotaruCount"></span>
+</button>
+<div class="hotaru-panel" id="hotaruPanel">
+  <div class="hotaru-head">蛍火（ほたるび）ログ<span class="sp"></span>
+    <button onclick="copyLog()" title="ログを全部コピー">コピー</button>
+    <button onclick="clearLog()">消去</button>
+    <button onclick="openHotaru(false)">閉</button>
+  </div>
+  <div class="hotaru-list" id="hotaruList"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ════════════════════════ データ定義 ════════════════════════ */
+const CATEGORIES = [
+  {id:"knowledge", label:"ナレッジ検索 / RAG"},
+  {id:"docparse",  label:"文書・図面解析"},
+  {id:"review",    label:"設計書・帳票レビュー"},
+  {id:"automation",label:"業務プロセス自動化"},
+  {id:"agent",     label:"自律AIエージェント"},
+];
+const DATATYPES = [
+  {id:"pdf",   label:"PDF文書"},
+  {id:"form",  label:"帳票"},
+  {id:"draw",  label:"図面"},
+  {id:"manual",label:"マニュアル"},
+  {id:"spec",  label:"仕様書"},
+  {id:"db",    label:"基幹DB / 構造化データ"},
+];
+const FEATURES = [
+  {id:"rag",      label:"RAG検索回答"},
+  {id:"ocr",      label:"OCR + 構造化抽出"},
+  {id:"summary",  label:"要約 / 整理"},
+  {id:"classify", label:"分類 / タグ付け"},
+  {id:"review",   label:"レビュー / 不備検出"},
+  {id:"extract",  label:"項目抽出"},
+];
+
+const DOCS = [
+  {id:"plan",     no:"DOC-01", kno:"第一",   name:"PoC企画書"},
+  {id:"req",      no:"DOC-02", kno:"第二",   name:"要件定義書"},
+  {id:"archspec", no:"DOC-03", kno:"第三",   name:"アーキテクチャ仕様書"},
+  {id:"arch",     no:"DOC-04", kno:"第四",   name:"技術アーキテクチャ設計"},
+  {id:"detail",   no:"DOC-05", kno:"第五",   name:"詳細設計書"},
+  {id:"impl",     no:"DOC-06", kno:"第六",   name:"実装仕様書"},
+  {id:"dataflow", no:"DOC-07", kno:"第七",   name:"データフロー仕様書"},
+  {id:"prompt",   no:"DOC-08", kno:"第八",   name:"プロンプト設計シート"},
+  {id:"test",     no:"DOC-09", kno:"第九",   name:"テスト仕様書"},
+  {id:"eval",     no:"DOC-10", kno:"第十",   name:"評価・検証計画書"},
+  {id:"ops",      no:"DOC-11", kno:"第十一", name:"運用設計書"},
+  {id:"manual",   no:"DOC-12", kno:"第十二", name:"お客様用手順書"},
+  {id:"risk",     no:"DOC-13", kno:"第十三", name:"リスク・前提条件"},
+  {id:"mtg",      no:"DOC-14", kno:"第十四", name:"会議用資料"},
+  {id:"study",    no:"DOC-15", kno:"第十五", name:"勉強会・研修資料"},
+  {id:"negopolite",no:"DOC-16", kno:"第十六", name:"顧客折衝ポイント"},
+  {id:"yamato",   no:"DOC-17", kno:"第十七", name:"実務やまと言葉"},
+  {id:"refs",     no:"DOC-18", kno:"第十八", name:"文書作法・参考資料"},
+  {id:"productivity",no:"DOC-19", kno:"第十九", name:"AI生産性データ分析"},
+  {id:"wbs",      no:"DOC-20", kno:"第二十", name:"WBS（Excel時短）"},
+  {id:"newbie",   no:"DOC-21", kno:"第二十一", name:"新人サポート・お任せ"},
+  {id:"instr",    no:"DOC-22", kno:"第二十二", name:"上位指示メモ・会議"},
+  {id:"glossary", no:"DOC-23", kno:"第二十三", name:"業界用語辞典"},
+  {id:"docreview",no:"DOC-24", kno:"第二十四", name:"AI設計書レビュー"},
+  {id:"academy",  no:"DOC-25", kno:"第二十五", name:"学びの教室"},
+  {id:"fblog",    no:"DOC-26", kno:"第二十六", name:"FB記録"},
+  {id:"clientmtg",no:"DOC-27", kno:"第二十七", name:"顧客MTG記録"},
+  {id:"kanban",   no:"DOC-28", kno:"第二十八", name:"和風カンバン"},
+  {id:"kaizenmtg",no:"DOC-29", kno:"第二十九", name:"カイゼンMTG"},
+];
+
+const state = {
+  category:"knowledge",
+  data:new Set(["pdf","manual"]),
+  feature:new Set(["rag","extract"]),
+  activeTab:"plan",
+  blank:false,
+  generated:null,   // {docId: markdownString}
+};
+
+/* ════════════════════════ UI 構築 ════════════════════════ */
+function buildChips(container, items, getSel, onToggle, single){
+  const el = document.getElementById(container);
+  el.innerHTML = "";
+  items.forEach(it=>{
+    const c = document.createElement("div");
+    c.className = "chip" + (getSel(it.id) ? " on":"");
+    c.textContent = it.label;
+    c.onclick = ()=>{ onToggle(it.id); buildAllChips(); if(typeof autosave==="function") autosave(); };
+    el.appendChild(c);
+  });
+}
+function buildAllChips(){
+  buildChips("c_category", CATEGORIES, id=>state.category===id, id=>state.category=id, true);
+  buildChips("c_data", DATATYPES, id=>state.data.has(id), id=>toggleSet(state.data,id));
+  buildChips("c_feature", FEATURES, id=>state.feature.has(id), id=>toggleSet(state.feature,id));
+}
+function toggleSet(s,id){ s.has(id)?s.delete(id):s.add(id); }
+
+function buildTabs(){
+  const el = document.getElementById("tabs");
+  el.innerHTML = "";
+  DOCS.forEach(d=>{
+    const t = document.createElement("button");
+    t.className = "tab"+(state.activeTab===d.id?" on":"");
+    t.innerHTML = `${d.kno}<b>${d.name}</b>`;
+    t.onclick = ()=>{ state.activeTab=d.id; buildTabs(); render(); };
+    el.appendChild(t);
+  });
+}
+
+/* API キー監視 */
+const apiKeyEl = document.getElementById("apiKey");
+apiKeyEl.addEventListener("input", ()=>{
+  const has = apiKeyEl.value.trim().length>10;
+  document.getElementById("apiDot").classList.toggle("on", has);
+  document.getElementById("genSub").textContent = has ? "AI MODE — 各章をClaudeで具体化" : "OFFLINE MODE — テンプレ生成";
+});
+
+/* ════════════════════════ ヘルパ ════════════════════════ */
+const labelOf = (arr,id)=> (arr.find(x=>x.id===id)||{}).label || id;
+const dataLabels = ()=> [...state.data].map(id=>labelOf(DATATYPES,id));
+const featLabels = ()=> [...state.feature].map(id=>labelOf(FEATURES,id));
+const catLabel = ()=> labelOf(CATEGORIES, state.category);
+
+function v(id){ return document.getElementById(id).value.trim(); }
+function fillOr(val, ph){ return val ? esc(val) : `<span class="fill">${ph}</span>`; }
+function esc(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+/* 入力サマリ（各doc共通） */
+function ctx(){
+  return {
+    project: v("f_project"),
+    client:  v("f_client"),
+    pain:    v("f_pain"),
+    term:    v("f_term"),
+    acc:     v("f_acc"),
+    llm:     v("f_llm"),
+    cat:     catLabel(),
+    data:    dataLabels(),
+    feats:   featLabels(),
+  };
+}
+
+/* ════════════════════════ オフライン生成（Markdown文字列） ════════════════════════
+   ※ 出力は誇張なしの叩き台。未入力箇所は《要記入》で残す（ウソつかず原則）。 */
+
+function mdPlan(c){
+  const goal = featurePurpose(c);
+  return `# ${c.project||"《案件名を記入》"}　PoC企画書
+> 本書はPoC立ち上げの叩き台です。確定事項と仮置きを区別し、《》は合意の上で埋めてください。
+
+## 1. 背景・課題
+- クライアント: ${c.client||"《業種・規模を記入》"}
+- 現状の課題: ${c.pain||"《対象業務の属人化・工数・品質ばらつき等を記入》"}
+- ${c.data.join("・")||"《対象データ》"} が ${c.cat} の主対象。現状は人手依存で、検索性・再利用性が低い前提で設計する。
+
+## 2. PoCの目的・ゴール
+本PoCは「${c.cat}」を ${c.data.join("・")||"対象データ"} に適用し、${goal}を検証する。
+判断したい問いは次の3点:
+1. 技術的に「使える精度」が出るか（${c.acc}）
+2. 現場の業務フローに載るか（運用負荷・受容性）
+3. 本番化したときの投資対効果が見込めるか
+
+## 3. スコープ
+| 区分 | 内容 |
+|---|---|
+| 対象 | ${c.feats.join("・")||"《AI機能》"} を ${c.data.join("・")||"対象データ"} に適用 |
+| 対象外 | 既存システムへの本番組み込み、全社展開、UIの作り込み |
+| データ範囲 | 代表的な ${pickNum(c)} 件程度のサンプルに限定 |
+
+## 4. 成功基準（Exit Criteria）
+- **定量**: ${c.acc}。回答の根拠提示率、応答時間（目標 ${respTarget(c)}）。
+- **定性**: 現場担当 ${"《N名》"} の評価で「実務で使いたい」が過半。
+- **判断**: 上記を満たせば本番設計フェーズへ。未達なら原因（データ品質/プロンプト/モデル）を切り分けて再試行 or 中止。
+
+## 5. 想定ソリューション概要
+${solutionLines(c)}
+
+## 6. 体制・役割
+| 役割 | 担当 | 主な責務 |
+|---|---|---|
+| PoCリード（当方） | 《氏名》 | 技術設計・プロンプト設計・評価設計・報告 |
+| クライアント窓口 | 《氏名》 | データ提供・現場調整・評価協力 |
+| 現場SME（有識者） | 《氏名》 | 正解データ作成・回答妥当性の判定 |
+
+## 7. スケジュール（全${c.term}）
+${schedule(c)}
+
+## 8. 前提・制約
+- データは ${c.llm||"《基盤》"} の利用ポリシー範囲で扱う。機密データの外部送信可否は事前合意。
+- 正解データ（評価用）はクライアント側SMEの協力前提。
+- 既存システム連携は本PoCの対象外。
+
+## 9. リスクと対策（要点）
+DOC-06「リスク・前提条件」を参照。主要リスクはデータ品質・正解作成工数・精度未達の3点。
+
+## 10. PoC後の本番展開判断基準
+- 精度・運用受容性・ROIの3軸でGo/No-Go判定。
+- Goの場合のみ、本番アーキテクチャ・セキュリティ要件・運用設計を次フェーズで定義。`;
+}
+
+function mdReq(c){
+  return `# ${c.project||"《案件名》"}　要件定義書（PoC範囲）
+> PoC検証に必要な範囲に限定。本番要件は次フェーズで別途定義する。
+
+## 1. 機能要件
+| ID | 機能 | 概要 | 優先度 |
+|---|---|---|---|
+${funcRows(c)}
+
+## 2. 非機能要件（PoC基準）
+| 観点 | 要件 |
+|---|---|
+| 精度 | ${c.acc}（評価計画 DOC-05 に準拠） |
+| 応答性能 | 1問あたり ${respTarget(c)} 以内（参考値） |
+| セキュリティ | データは${c.client?esc(c.client):"クライアント"}指定の環境内で処理。外部送信範囲を事前合意 |
+| 説明性 | 回答に根拠（出典箇所）を提示できること |
+| 運用 | 非エンジニアが操作・評価できる最低限のUIを用意 |
+
+## 3. データ要件
+- 入力: ${c.data.join("・")||"《対象データ》"}
+- 形式: ${dataFormats(c)}
+- 前処理: ${preprocess(c)}
+- 件数: 代表サンプル ${pickNum(c)} 件（評価可能な多様性を確保）
+
+## 4. 制約事項
+- 本番システム連携・大規模データ投入は対象外。
+- 正解データ整備はSME協力に依存。
+- ${c.data.includes("図面")||c.data.includes("帳票")?"図面・帳票のレイアウト多様性により、抽出精度はサンプル構成に左右される。":"対象データの表記揺れ・品質ばらつきが精度に影響する。"}`;
+}
+
+/* ===== 追加章ジェネレータ（アーキ仕様/詳細設計/実装/データフロー/テスト/運用/手順書） ===== */
+function mdArchspec(c){
+  const rag=state.feature.has("rag")||state.category==="knowledge";
+  const ocr=state.feature.has("ocr")||state.data.has("draw")||state.data.has("form");
+  const rows=[]; let n=1; const add=(nm,role,tech)=>rows.push(`| C-${String(n++).padStart(2,"0")} | ${nm} | ${role} | ${tech} |`);
+  add("取り込み","対象データの収集・登録","ストレージ / バッチ");
+  if(ocr) add("OCR・構造化","非構造データの抽出","OCR + レイアウト解析");
+  add("前処理","正規化・チャンク分割・メタ付与","Python");
+  if(rag){ add("Embedding","ベクトル化","Embeddingモデル"); add("ベクタDB","索引・類似検索","ベクトルストア"); add("検索","ベクトル+全文の複合検索","ハイブリッド検索"); }
+  add("LLM推論","回答 / 抽出 / レビュー生成",c.llm||"《LLM》");
+  add("API / アプリ","オーケストレーション・認可","Python / Django");
+  add("評価ログ","精度・コスト計測","Django + DB");
+  return `# ${c.project||"《案件名》"}　アーキテクチャ仕様書
+> 本書はシステム全体の構造と方針を定めます。内部の処理粒度は「詳細設計書」に委ねます。
+
+## 1. システム概要
+- 位置づけ: ${c.cat} を ${c.data.join("・")||"対象データ"} に適用するAIシステム。
+- 全体像: 取り込み→前処理→${rag?"検索→":""}LLM推論→出力（根拠付き）→評価ログ。
+
+## 2. 構成方針（非機能起点）
+| 観点 | 方針 |
+|---|---|
+| 可用性 | PoCは単一構成。本番は冗長化を別途検討 |
+| 性能 | 1問あたり ${respTarget(c)} 目安（参考） |
+| セキュリティ | データは${c.client?c.client:"クライアント"}指定環境内で処理、外部送信は事前合意 |
+| 拡張性 | 取り込み・モデルを差し替え可能な疎結合構成 |
+| コスト | トークン・API課金を評価ログで可視化 |
+
+## 3. コンポーネント構成
+| ID | コンポーネント | 責務 | 技術候補 |
+|---|---|---|---|
+${rows.join("\n")}
+
+## 4. 外部インターフェース
+| IF | 種別 | 概要 | 形式 |
+|---|---|---|---|
+| 質問応答 | 同期API | 質問→根拠付き回答 | JSON |
+| 取り込み | 非同期 | 文書登録→索引化 | ファイル / キュー |
+| 評価 | 内部 | 入出力・スコア記録 | DB |
+
+## 5. データ保存方針
+- ベクトル（検索）／メタデータ（管理）／評価ログ（計測）を分離して保持。
+- 機微情報の保持範囲・期間は「データフロー仕様書」で定義。
+
+## 6. 制約・前提
+- 本書はPoC〜本番初期の指針。SLA・大規模スケールは確定後に改訂。`;
+}
+
+function mdDetail(c){
+  const ocr=state.feature.has("ocr")||state.data.has("draw")||state.data.has("form");
+  const rag=state.feature.has("rag")||state.category==="knowledge";
+  return `# ${c.project||"《案件名》"}　詳細設計書
+> 本書はコンポーネント内部の処理・データ構造・内部IFを、実装可能な粒度で定めます。
+
+## 1. 対象範囲
+- 対象: ${c.feats.join("・")||"《AI機能》"} を担う中核パイプライン。
+- 対象外: 認可・課金・UIの作り込み（PoC範囲外）。
+
+## 2. 処理シーケンス（主要フロー）
+1. 入力受領（${c.data.join("・")||"対象データ"} / 質問）
+${ocr?"2. OCR・レイアウト解析でテキスト/構造を抽出\n":""}3. 前処理（正規化・チャンク分割・メタ付与）
+${rag?"4. Embedding生成 → ベクタDBへ索引化\n5. 検索（ベクトル+全文）で関連文脈を取得\n":""}6. LLM推論（プロンプト適用・出力スキーマ強制）
+7. 後処理（根拠の突合・整形）
+8. 評価ログ記録（入力・出力・スコア・コスト）
+
+## 3. モジュール設計
+| モジュール | 入力 | 主処理 | 出力 |
+|---|---|---|---|
+| ingest | ファイル | 取り込み・正規化 | 正規化文書 |
+${ocr?"| extract | 画像/PDF | OCR・構造化 | テキスト/項目 |\n":""}| chunker | 文書 | 分割・メタ付与 | チャンク[] |
+${rag?"| indexer | チャンク | ベクトル化・登録 | 索引 |\n| retriever | 質問 | 複合検索 | 関連チャンク[] |\n":""}| generator | 文脈+質問 | LLM推論 | 回答+根拠 |
+| evaluator | 入出力 | スコア算出 | 評価レコード |
+
+## 4. 主要データ構造
+\`\`\`json
+{
+  "chunk": {"id":"string","doc":"string","text":"string","meta":{"page":0,"source":"string"}},
+  "retrieval": [{"chunk_id":"string","score":0.0}],
+  "answer": {"text":"string","confidence":"high|medium|low","citations":[{"source":"string","locator":"string"}],"unanswerable":false}
+}
+\`\`\`
+
+## 5. 内部API仕様
+| エンドポイント | メソッド | 入力 | 出力 |
+|---|---|---|---|
+| /ingest | POST | ファイル | 取り込み結果 |
+| /query | POST | 質問 | 回答+根拠(JSON) |
+| /eval/run | POST | 評価セットID | スコア集計 |
+
+## 6. エラー処理・例外
+| 事象 | 検知 | 振る舞い |
+|---|---|---|
+| 抽出失敗 | 例外/空結果 | 当該文書をスキップし記録、処理継続 |
+| 検索ヒット0 | 件数判定 | 「資料に記載なし」を返す（捏造禁止） |
+| LLMタイムアウト | タイムアウト | 再試行《N》回→失敗時はエラー応答 |
+
+## 7. 設定値（既定）
+| 設定 | 既定 | 説明 |
+|---|---|---|
+| chunk_size | 《512》 | 分割サイズ（トークン目安） |
+| top_k | 《5》 | 検索取得件数 |
+| temperature | 《0.0》 | 生成のばらつき |
+| max_tokens | 《1024》 | 生成上限 |`;
+}
+
+function mdImpl(c){
+  return `# ${c.project||"《案件名》"}　実装仕様書
+> 本書は実装の取り決め（言語・構成・依存・規約）を定め、属人化と手戻りを防ぎます。
+
+## 1. 開発環境・言語
+- 言語/FW: **Python / Django**（バージョン《3.x / 5.x》）
+- 仮想環境: venv / uv 等、依存固定（requirements / lock）
+
+## 2. リポジトリ構成
+\`\`\`text
+project/
+├─ app/            # Django アプリ（API・管理）
+├─ core/           # 取り込み・前処理・検索・生成
+├─ prompts/        # プロンプト資産（版管理）
+├─ eval/           # 評価セット・スクリプト
+├─ tests/          # 単体・結合テスト
+└─ config/         # 設定・環境変数テンプレ
+\`\`\`
+
+## 3. 主要ライブラリ・依存
+| 用途 | ライブラリ（候補） | 備考 |
+|---|---|---|
+| Web/API | Django / DRF | 管理画面・API |
+| LLM | 各社SDK | ${c.llm||"《基盤》"} |
+| 検索 | ベクトルストアSDK | 《選定》 |
+| データ処理 | pandas 等 | 前処理 |
+| テスト | pytest | カバレッジ計測 |
+
+## 4. コーディング規約
+- PEP8 準拠、型ヒント必須、Lint（ruff）・整形（black）をCIで強制。
+- 命名は役割が分かる語に。秘匿値はコードに直書きしない。
+- 1コミット1論点、レビュー必須（最低1名）。
+
+## 5. 環境変数・シークレット
+| 変数 | 用途 | 取り扱い |
+|---|---|---|
+| LLM_API_KEY | LLM認証 | シークレット管理（リポジトリに含めない） |
+| VECTOR_URL | ベクタDB接続 | 環境変数 |
+| DATA_DIR | データ配置 | 環境変数 |
+
+## 6. ビルド・実行手順
+1. 依存インストール（lock固定）
+2. 環境変数設定（テンプレからコピー）
+3. マイグレーション実行
+4. 取り込みバッチ → 索引化
+5. 開発サーバ起動 → 動作確認
+
+## 7. テスト方針（実装観点）
+- 単体（モジュール）・結合（パイプライン）を pytest で。
+- カバレッジ目標《70%》。AI精度の評価は「テスト仕様書／評価計画」に従う。`;
+}
+
+function mdDataflow(c){
+  const ocr=state.feature.has("ocr")||state.data.has("draw")||state.data.has("form");
+  const rag=state.feature.has("rag")||state.category==="knowledge";
+  return `# ${c.project||"《案件名》"}　データフロー仕様書
+> データの源泉から出力・保管までの流れと、機微情報の取り扱いを定めます。
+
+## 1. データフロー全体
+\`\`\`
+[${c.data.join(" / ")||"対象データ"}]
+   │ 取り込み
+   ▼
+${ocr?"[OCR / 構造化] → テキスト・項目\n   │\n   ▼\n":""}[前処理：正規化・チャンク・メタ付与]
+   │
+   ▼
+${rag?"[Embedding → ベクタDB] → [検索]\n   │\n   ▼\n":""}[LLM推論：${c.feats.join(" / ")||"生成"}]
+   │
+   ▼
+[出力（根拠付き）] ──→ [評価ログ／監査ログ]
+\`\`\`
+
+## 2. データ一覧
+| データ | 源泉 | 形式 | 機微度 | 保管先 |
+|---|---|---|---|---|
+| 原本 | ${c.client||"クライアント"} | ${dataFormats(c)} | 《高/中/低》 | 《保管先》 |
+| 抽出テキスト | 前処理 | テキスト | 《》 | 一時/索引 |
+| ベクトル | Embedding | 数値 | 低 | ベクタDB |
+| 回答・ログ | 推論 | JSON | 《》 | ログDB |
+
+## 3. 変換・加工ステップ
+| # | ステップ | 入力 | 出力 | 備考 |
+|---|---|---|---|---|
+| 1 | 取り込み | 原本 | 正規化文書 | 形式判定 |
+${ocr?"| 2 | OCR/構造化 | 画像/PDF | テキスト/項目 | 失敗は記録 |\n":""}| 3 | チャンク分割 | 文書 | チャンク | メタ付与 |
+${rag?"| 4 | 索引化 | チャンク | ベクトル索引 | — |\n":""}| 5 | 推論 | 文脈+質問 | 回答+根拠 | 出力スキーマ強制 |
+
+## 4. 個人情報・機微情報の扱い
+- 外部送信の可否: 《可 / 不可（範囲）》
+- マスキング対象: 《氏名・連絡先・図番 等》
+- 保持期間: 《N日 / PoC終了時に削除》
+
+## 5. データ品質・バリデーション
+- 取り込み時に形式・文字化け・欠損を検査し、不良は記録して隔離。
+- サンプルの多様性（様式・記入揺れ）を評価セットへ反映。
+
+## 6. ログ・監査
+- 入力・出力・スコア・コストを記録。アクセスは最小権限で。`;
+}
+
+function mdTest(c){
+  return `# ${c.project||"《案件名》"}　テスト仕様書
+> 「評価・検証計画」と対に、機能・非機能のテスト項目を具体化します。
+
+## 1. テスト方針・範囲
+- 範囲: 中核パイプラインの機能、AI精度、性能、基本的な安全性。
+- 範囲外: 大規模負荷・本番セキュリティ監査（本番フェーズで実施）。
+
+## 2. テスト種別
+| 種別 | 目的 | 手段 |
+|---|---|---|
+| 単体 | モジュール正当性 | pytest |
+| 結合 | パイプライン疎通 | シナリオ実行 |
+| 精度 | AI回答の正しさ | 評価セット採点 |
+| 性能 | 応答時間 | 計測（目標 ${respTarget(c)}） |
+| 安全性 | 誤答・情報漏れ | 異常系・禁止出力確認 |
+| 受入 | 業務要件充足 | SMEレビュー |
+
+## 3. テストケース（主要）
+| ID | 観点 | 前提 | 手順 | 期待結果 | 結果 |
+|---|---|---|---|---|---|
+| TC-01 | 通常質問 | 索引済み | 代表質問を入力 | 正答+出典提示 | 《》 |
+| TC-02 | 根拠なし | 該当資料なし | 範囲外を質問 | 「記載なし」と返す | 《》 |
+| TC-03 | 抽出 | 対象様式 | 項目抽出を実行 | 規定項目を抽出 | 《》 |
+| TC-04 | 性能 | 通常時 | 連続${pickNum(c)}件 | ${respTarget(c)}以内 | 《》 |
+
+## 4. 精度テスト（AI固有）
+- 評価セット: ${pickNum(c)}件、易/中/難を配分。
+- 合格ライン: **${c.acc}**、ハルシネーション率 《上限》以下、根拠正答率 《目標》以上。
+
+## 5. 不具合管理
+| ID | 事象 | 重大度 | 状態 |
+|---|---|---|---|
+| BUG-01 | 《事象》 | 《高/中/低》 | 《起票/対応中/完了》 |
+
+## 6. 完了基準（テスト）
+- 主要TCが全て合格、精度が合格ライン到達、未解決の重大不具合なし。`;
+}
+
+function mdOps(c){
+  return `# ${c.project||"《案件名》"}　運用設計書
+> 本番運用（PoC後を想定）の体制・監視・障害対応・更新を定めます。
+
+## 1. 運用体制・役割
+| 役割 | 担当 | 範囲 |
+|---|---|---|
+| 運用リード | 《氏名》 | 全体・障害指揮 |
+| 監視担当 | 《氏名》 | アラート一次対応 |
+| モデル管理 | 《氏名》 | プロンプト/モデル更新 |
+
+## 2. SLO（目安）
+| 指標 | 目標 |
+|---|---|
+| 稼働率 | 《99.x%》 |
+| 応答時間 | ${respTarget(c)}（p95《》） |
+| 精度劣化検知 | 週次で評価セット再採点 |
+
+## 3. 監視・アラート
+| 監視対象 | 指標 | しきい値 | 通知先 |
+|---|---|---|---|
+| API | エラー率/遅延 | 《閾値》 | 《通知先》 |
+| コスト | トークン/課金 | 《上限》 | 《通知先》 |
+| 精度 | 採点スコア | 《下限》 | 《通知先》 |
+
+## 4. 障害対応フロー
+1. 検知（監視/連絡）
+2. 一次対応（影響範囲の確認・必要なら縮退）
+3. 切り分け（データ/検索/プロンプト/モデル/基盤）
+4. 復旧（修正 or ロールバック）
+5. 事後（記録・再発防止・関係者共有）
+
+## 5. バックアップ・復旧
+- 索引・設定・プロンプト資産を定期バックアップ。復旧手順を明文化。
+
+## 6. モデル / プロンプト更新運用
+- 変更は版管理し、**再評価ゲート**（合格ライン未満は本番反映しない）を通す。
+- 問題時は直前版へロールバック。
+
+## 7. コスト監視
+- 月次でトークン消費と課金を確認し、閾値超過で通知。`;
+}
+
+function mdManual(c){
+  return `# ${c.project||"《案件名》"}　ご利用手順書（お客様向け）
+> 専門用語をできるだけ避け、はじめての方でも操作いただけるようご案内します。
+
+## 1. はじめに（できること）
+- ${c.data.join("・")||"資料"}について、質問すると${state.feature.has("review")?"内容の確認や不備の指摘":"資料に基づいた回答"}が得られます。
+- 回答には「どの資料のどこを見たか（出典）」が付きます。
+
+## 2. ご利用の準備
+| 項目 | 内容 |
+|---|---|
+| アカウント | 《発行方法》 |
+| 権限 | 《閲覧 / 利用範囲》 |
+| 対応環境 | 《ブラウザ / 推奨環境》 |
+
+## 3. 基本の使い方（ステップ）
+1. ログインします。
+2. 調べたい資料を選ぶ、または質問を入力します。
+3. 回答と「出典」を確認します（出典が無い場合は鵜呑みにしないでください）。
+4. 必要に応じて結果を保存・コピーします。
+
+## 4. よくあるご質問
+| ご質問 | お答え |
+|---|---|
+| 回答が見つからないと出ます | 資料に根拠が無い場合はそのように表示されます。質問を具体的にしてお試しください。 |
+| 出典はどう見ますか | 回答の下に資料名と該当箇所が表示されます。 |
+| 機密資料を入れても大丈夫ですか | 《取り扱い方針に従ってご利用ください》 |
+
+## 5. 困ったときは
+- 回答がずれる: 質問を短く具体的に、固有名詞を添えてお試しください。
+- 出典が無い回答: 参考程度とし、原本でご確認ください。
+
+## 6. お問い合わせ
+- 窓口: 《部署 / メール / 受付時間》`;
+}
+
+function mdArch(c){
+  const usesRag = state.feature.has("rag") || state.category==="knowledge";
+  const usesOcr = state.feature.has("ocr") || state.data.has("draw") || state.data.has("form");
+  return `# ${c.project||"《案件名》"}　技術アーキテクチャ設計
+> PoC検証用の最小構成。本番のスケール・冗長化は対象外。
+
+## 1. 全体構成（データフロー）
+\`\`\`
+[${c.data.join(" / ")||"対象データ"}]
+      │  ① 取り込み
+      ▼
+${usesOcr?"[OCR / レイアウト解析] ─ ② テキスト・構造化抽出\n      │\n      ▼\n":""}[前処理・チャンク分割] ─ ③ 正規化 / メタ付与
+      │
+      ▼
+${usesRag?"[Embedding → ベクタDB] ─ ④ 索引化\n      │\n      ▼\n[検索（ベクトル + キーワード）] ─ ⑤ 関連文脈取得\n      │\n      ▼\n":""}[LLM 推論] ─ ⑥ ${c.feats.join(" / ")||"生成・抽出"}
+      │
+      ▼
+[出力 + 根拠提示] ─ ⑦ UI / API
+      │
+      ▼
+[評価ログ] ─ ⑧ 精度・コスト計測（DOC-05）
+\`\`\`
+
+## 2. コンポーネント
+| # | コンポーネント | 役割 | 技術候補 |
+|---|---|---|---|
+${archRows(c, usesRag, usesOcr)}
+
+## 3. モデル選定方針
+- 基盤: ${c.llm||"《LLM / 基盤を記入》"}
+- 選定軸: 精度 / コスト / レイテンシ / データ取り扱いポリシー（外部送信可否）の4点で比較。
+- PoCでは2モデル程度を同一評価セットで横並び比較し、本番候補を絞る。
+
+## 4. アプリケーション層
+- バックエンド: **Python / Django**（API・評価ログ管理・管理画面）
+- 非同期処理: 取り込み・索引化はバッチ/キュー処理を想定
+- データ: 構造化メタは ${c.data.includes("基幹DB / 構造化データ")?"既存DBと連携":"SQLite/PostgreSQL"}、ベクトルは専用ストアに分離
+
+## 5. PoCで割り切る点
+- 認証・権限・監査は最小限（本番要件は次フェーズ）。
+- スケール・可用性の作り込みは行わない。
+- まず「精度が出るか」の検証に資源を集中する。`;
+}
+
+function mdPrompt(c){
+  const feat = [...state.feature][0] || "rag";
+  return `# ${c.project||"《案件名》"}　プロンプト設計シート
+> プロンプトは資産。バージョン管理し、評価セットと対で改善する（DOC-05連動）。
+
+## 1. 設計方針
+- 役割・制約・出力形式を明示し、ハルシネーションを抑制する。
+- 「分からない場合は分からないと答える」を必須ルール化（${"ウソつかせない"}）。
+- 根拠（出典）の提示を出力スキーマに組み込む。
+
+## 2. システムプロンプト雛形
+\`\`\`text
+あなたは${c.client||"《業種》"}の業務を支援する${roleByCat(c)}です。
+与えられた${c.data.join("・")||"資料"}の内容のみに基づいて回答してください。
+
+# ルール
+- 資料に根拠がない事項は推測せず「資料に記載なし」と答える
+- 回答には必ず参照元（ファイル名・該当箇所）を付す
+- ${ruleByFeature(c)}
+
+# 出力形式
+${outputSchema(c)}
+\`\`\`
+
+## 3. 入出力スキーマ（構造化）
+\`\`\`json
+{
+  "answer": "回答本文",
+  "confidence": "high | medium | low",
+  "citations": [{"source": "ファイル名", "locator": "ページ/項番"}],
+  "unanswerable": false
+}
+\`\`\`
+
+## 4. Few-shot方針
+- ${c.data.includes("図面")||c.data.includes("帳票")?"レイアウトの異なる代表3パターンを例示し、抽出フォーマットを固定する。":"代表的な良問・難問を各2例、期待出力付きで提示する。"}
+- 失敗パターン（誤抽出・過剰回答）を反例として与え、抑制する。
+
+## 5. ガードレール
+| リスク | 対策 |
+|---|---|
+| ハルシネーション | 根拠なし回答を禁止 + confidence/unanswerableで自己申告 |
+| 機密漏えい | 出力前にマスキングルールを適用（${"《対象項目》"}） |
+| プロンプトインジェクション | 入力資料を命令と分離（区切り・ロール固定） |
+
+## 6. バージョン管理
+- \`prompt_v1.0\` から開始。評価セットでスコア化し、変更は差分とスコアをセットで記録。
+- 改善は1要素ずつ（複数同時変更は効果を切り分けられないため）。`;
+}
+
+function mdEval(c){
+  return `# ${c.project||"《案件名》"}　評価・検証計画書
+> 「なんとなく良さそう」を排し、数値とサンプルで Go/No-Go を判断する。
+
+## 1. 評価観点
+| 観点 | 説明 | 指標 |
+|---|---|---|
+| 正確性 | 回答が事実として正しいか | 正答率 / 完全一致率 |
+| 網羅性 | 必要情報を取りこぼさないか | 再現率（Recall） |
+| 妥当性 | 過剰・無関係な回答がないか | 適合率（Precision） |
+| 根拠性 | 出典提示が正しいか | 根拠正答率 |
+| 安全性 | ハルシネーション・誤抽出 | 誤答率 / 不明時の正しい棄却率 |
+| 実用性 | 応答時間・コスト | 平均レイテンシ / 1件あたりコスト |
+
+## 2. 合格ライン
+- 主指標: ${c.acc}
+- 根拠正答率 ${"《目標値》"}以上、ハルシネーション率 ${"《上限値》"}以下。
+- 定性: SME評価で「実務利用可」が過半。
+
+## 3. テストデータセット設計
+- 件数: ${pickNum(c)} 件（${c.data.join("・")||"対象データ"}の多様性を反映）
+- 構成: 易/中/難 を ${"《比率》"} で配分し、難問でも破綻しないか確認。
+- 正解: SMEが作成。判断が割れる問いは「許容回答の幅」も定義。
+${c.data.includes("図面")||c.data.includes("帳票")?"- レイアウト・記入揺れの異なるパターンを意図的に含める。":"- 表記揺れ・同義語を含む現実的な問いを入れる。"}
+
+## 4. 評価手順
+1. 評価セットを固定（途中で変えない）。
+2. プロンプト/モデルのバージョンごとに一括実行し、ログを蓄積。
+3. 指標を自動集計 + SMEが誤答をレビューし原因分類（データ/検索/プロンプト/モデル）。
+4. 1要素ずつ改善 → 再評価。スコア推移を記録。
+
+## 5. 結果記録フォーマット
+| 版 | 日付 | 正答率 | 根拠正答率 | 誤答率 | レイテンシ | 主な改善点 |
+|---|---|---|---|---|---|---|
+| v1.0 | 《日付》 | — | — | — | — | 初期ベースライン |
+
+## 6. 原因切り分けの指針
+- 検索が外れる → チャンク設計・索引・クエリ拡張を見直す。
+- 検索は当たるが回答が誤る → プロンプト・出力制約を見直す。
+- 特定データ型だけ弱い → 前処理（OCR/構造化）を疑う。`;
+}
+
+function mdRisk(c){
+  return `# ${c.project||"《案件名》"}　リスク・前提条件
+> 期待値を揃え、後の「揉めない」ための合意文書。
+
+## 1. 前提条件
+- 評価用データ・正解はクライアント側SMEの協力前提で整備する。
+- ${c.llm||"《基盤》"} の利用範囲・データ取り扱いポリシーは事前合意済みとする。
+- PoCは検証が目的であり、本番品質（可用性・セキュリティ・UI）の作り込みは対象外。
+
+## 2. リスク一覧
+| リスク | 影響 | 可能性 | 対策 |
+|---|---|---|---|
+| データ品質のばらつき（${c.data.join("・")||"対象データ"}） | 精度低下 | 中 | 代表サンプルで早期に品質を可視化、前処理で吸収 |
+| 正解データ作成の工数増 | 遅延 | 中 | 件数を絞り、判定基準をSMEと先に固める |
+| 精度が目標未達（${c.acc}） | Go判断不可 | 中 | 原因を切り分け、データ/プロンプト/モデルの順に改善 |
+| 機密情報の取り扱い | コンプラ | 低〜中 | マスキング・処理環境を事前合意、外部送信を限定 |
+| 期待値の過大化 | 評価のブレ | 中 | スコープ・できないことを企画書で明文化 |
+${c.data.includes("図面")?"| 図面の多様なレイアウト | 抽出漏れ | 中 | 代表パターンを評価セットに含め限界を明示 |":""}
+
+## 3. 依存事項
+- SMEの稼働確保（正解作成・妥当性判定）。
+- データ提供のタイミング（${c.term}の前半で確定が必要）。
+
+## 4. このPoCで「やらないこと」
+- 全社展開・本番組み込み
+- 大規模データの一括投入
+- UI / 権限管理の作り込み
+
+> これらを企画段階で握ることで、評価フェーズでの認識齟齬を防ぐ。`;
+}
+
+/* ── 生成補助ロジック ── */
+function featurePurpose(c){
+  const f=state.feature;
+  if(f.has("review")) return "不備・矛盾の自動検出により、レビュー工数と見落としを削減できるか";
+  if(f.has("rag"))    return "資料に基づく正確な回答で、問い合わせ対応の属人化を解消できるか";
+  if(f.has("ocr")||f.has("extract")) return "非構造の資料から必要項目を構造化抽出できるか";
+  if(f.has("summary"))return "大量資料の要約・整理で確認工数を削減できるか";
+  return "対象業務をAIで支援できるか";
+}
+function pickNum(c){
+  return c.data.has?"50〜100":"50〜100";
+}
+function respTarget(c){
+  return state.feature.has("ocr")||state.data.has("draw") ? "10秒" : "5秒";
+}
+function solutionLines(c){
+  const lines=[];
+  if(state.feature.has("ocr")) lines.push("- OCR・レイアウト解析で "+c.data.join("・")+" をテキスト/構造化データに変換");
+  if(state.feature.has("rag")||state.category==="knowledge") lines.push("- ベクトル検索 + LLMで、資料に根拠を持った回答を生成（RAG）");
+  if(state.feature.has("extract")) lines.push("- 指定項目の抽出と表形式での出力");
+  if(state.feature.has("review")) lines.push("- ルール/過去事例と突合し、不備・矛盾候補を提示");
+  if(state.feature.has("classify")) lines.push("- 文書の自動分類・タグ付け");
+  if(state.feature.has("summary")) lines.push("- 要点抽出・要約による確認工数の削減");
+  lines.push("- 評価ログを蓄積し、精度・コストを定量的に可視化");
+  return lines.join("\n");
+}
+function schedule(c){
+  const weeks = parseInt(c.term)||8;
+  const p = Math.max(1,Math.round(weeks/4));
+  return `| フェーズ | 期間 | 主な作業 |
+|---|---|---|
+| ① 立ち上げ・データ確認 | 〜${p}週 | データ受領・品質確認・評価セット設計 |
+| ② 実装・索引化 | 〜${p*2}週 | 前処理・${state.feature.has("rag")?"索引化・":""}基本パイプライン構築 |
+| ③ プロンプト改善・評価 | 〜${p*3}週 | 評価→改善の反復、モデル比較 |
+| ④ 取りまとめ・報告 | 〜${weeks}週 | 結果整理・Go/No-Go判断材料・本番提案 |`;
+}
+function funcRows(c){
+  const rows=[]; let n=1;
+  const add=(name,desc,pri)=>rows.push(`| F-${String(n++).padStart(2,"0")} | ${name} | ${desc} | ${pri} |`);
+  if(state.feature.has("ocr")) add("文書取り込み・抽出", c.data.join("・")+"からテキスト/構造を抽出","高");
+  if(state.feature.has("rag")||state.category==="knowledge") add("根拠付き回答","質問に対し資料に基づき回答+出典提示","高");
+  if(state.feature.has("extract")) add("項目抽出","指定フォーマットで必要項目を抽出","高");
+  if(state.feature.has("review")) add("不備検出","ルール/事例と突合し矛盾候補を提示","高");
+  if(state.feature.has("classify")) add("自動分類","文書を所定カテゴリに分類・タグ付け","中");
+  if(state.feature.has("summary")) add("要約","長文資料の要点を整理","中");
+  add("評価ログ","入出力と評価結果を記録・集計","高");
+  add("簡易UI","非エンジニアが質問・評価できる画面","中");
+  return rows.join("\n");
+}
+function dataFormats(c){
+  const f=[];
+  if(c.data.includes("PDF文書")) f.push("PDF（テキスト/スキャン混在想定）");
+  if(c.data.includes("帳票")) f.push("帳票（定型/非定型）");
+  if(c.data.includes("図面")) f.push("図面（CAD出力/スキャン）");
+  if(c.data.includes("マニュアル")||c.data.includes("仕様書")) f.push("Office文書 / PDF");
+  if(c.data.includes("基幹DB / 構造化データ")) f.push("DBエクスポート / CSV");
+  return f.join("、")||"《形式を記入》";
+}
+function preprocess(c){
+  if(state.feature.has("ocr")||state.data.has("draw")||state.data.has("form"))
+    return "OCR・レイアウト解析 → ノイズ除去 → チャンク分割 → メタデータ付与";
+  return "テキスト抽出 → 正規化 → チャンク分割 → メタデータ付与";
+}
+function archRows(c,rag,ocr){
+  const r=[]; let n=1;
+  const add=(name,role,tech)=>r.push(`| ${n++} | ${name} | ${role} | ${tech} |`);
+  add("取り込み","対象データの収集・登録","ファイルストレージ / バッチ");
+  if(ocr) add("OCR・構造化","非構造データのテキスト/レイアウト抽出","OCR + レイアウト解析");
+  add("前処理","正規化・チャンク分割・メタ付与","Python");
+  if(rag){ add("Embedding","文書のベクトル化","Embeddingモデル"); add("ベクタDB","索引・類似検索","ベクトルストア"); add("検索","ベクトル+キーワード検索","ハイブリッド検索"); }
+  add("LLM推論","回答/抽出/レビュー生成",c.llm||"《LLM》");
+  add("アプリ/API","オーケストレーション・管理","Python / Django");
+  add("評価ログ","精度・コスト計測","Django + DB");
+  return r.join("\n");
+}
+function roleByCat(c){
+  switch(state.category){
+    case "review": return "設計書・帳票レビュー支援AI";
+    case "docparse": return "文書・図面解析アシスタント";
+    case "agent": return "業務支援AIエージェント";
+    case "automation": return "業務自動化アシスタント";
+    default: return "社内ナレッジ検索アシスタント";
+  }
+}
+function ruleByFeature(c){
+  if(state.feature.has("review")) return "不備・矛盾は「指摘」と「根拠」をセットで提示する";
+  if(state.feature.has("extract")||state.feature.has("ocr")) return "抽出できない項目は空欄とし、捏造しない";
+  return "複数解釈がある場合は選択肢を併記する";
+}
+function outputSchema(c){
+  if(state.feature.has("extract")||state.feature.has("ocr"))
+    return "抽出項目を JSON で返す（項目名: 値、未取得は null）。";
+  if(state.feature.has("review"))
+    return "指摘リスト（対象箇所 / 種別 / 根拠 / 重大度）を返す。";
+  return "回答 + confidence + citations を JSON で返す（スキーマは §3）。";
+}
+
+function mdStudy(c){
+  return `# ${c.project||"《案件名》"}　勉強会・研修 企画/運営資料
+> 本書は、クライアントのお困りごとの把握から、研修の設計・運営、新規カリキュラム企画までを束ねます。引用は必ず出典を添え、うそや誇張をしません。
+
+## 1. ねらい・対象
+- ねらい: 現場の課題を、生成AIの活用で前に進められる人材を育てる。
+- 対象: 新卒〜キャリア入社のエンジニア／非エンジニア（プログラミング基礎〜生成AI活用）。
+
+## 2. クライアントのニーズ把握・提案策定
+- 各社それぞれにお困りごとがあるため、一つずつヒアリングして把握し、当社として対応すべきことを整理して進める。
+| 区分 | 内容 |
+|---|---|
+| ヒアリング項目 | 課題・現状・体制・データ・ご期待 |
+| 把握の手段 | ヒアリングシート・現場観察・サンプル確認 |
+| 提案の型 | 課題 → 打ち手 → 効果 → 進め方（小さく検証） |
+| 自由記入 | 《お客様固有の事情・制約》 |
+
+## 3. 研修カリキュラム（標準）
+| 回 | テーマ | 到達目標 | 形式 |
+|---|---|---|---|
+| 1 | プログラミング基礎 | 基本文法と読み書き | 講義+演習 |
+| 2 | 生成AIを活用した開発 | AIと協働する開発の型 | 講義+演習 |
+| 3 | プロンプトエンジニアリング | 役割/制約/出力形式/Few-shot | 演習 |
+| 4 | AI出力コードの評価・修正 | 妥当性検証・テスト・リファクタ | 演習 |
+| 5 | 総合演習 | 小課題をAI併用で完成 | 演習 |
+> AI時代に求められるのは「プロンプト設計」と「AIが出力したコードを評価・修正する力」。開発演習はもちろん、手を動かして伝授する。
+
+## 4. 演習・評価
+- 演習: 実課題に近い小課題を、AI併用で設計 → 実装 → 検証。
+- 評価: 成果物＋プロセス（なぜそうしたか）。WHY → WHAT → HOW で振り返る。
+
+## 5. 新規カリキュラムの企画・開発
+- 現場ニーズを的確に把握した上で、マニュアルワークやAI活用ガイドライン等の**ISO形式コンテンツ**を制作する。
+| 成果物 | 内容 | 準拠（参考規格） |
+|---|---|---|
+| マニュアルワーク | 手順書・利用情報 | IEC/IEEE 82079-1:2019、ISO/IEC 26514 |
+| AI活用ガイドライン | 責任ある利用・統制 | ISO/IEC 42001:2023 |
+| 教材・運用文書 | 章立て・版管理 | 社内規程＋上記に整合 |
+> ISO形式（利用情報の作成・ソフトウェア文書・AIマネジメント）に沿うと、品質と監査性が揃う。
+
+## 6. うまくいった事例・失敗事例（参考）
+> 成功と失敗の双方から学ぶ。固有の事例は事実のみを記し、脚色しない。
+| 区分 | 事例（概要） | 学び・次の一手 |
+|---|---|---|
+| 成功 | 《うまくいった事例》 | 《再現したい要因》 |
+| 失敗 | 《つまずいた事例》 | 《再発防止・改善》 |
+
+## 7. 参考文献・参考記事（出典を必ず添える）
+**海外（査読・著名）**
+- Vaswani et al. (2017) Attention Is All You Need. NeurIPS. arXiv:1706.03762
+- Lewis et al. (2020) Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks. NeurIPS 33. arXiv:2005.11401
+- Wei et al. (2022) Chain-of-Thought Prompting Elicits Reasoning in Large Language Models. NeurIPS 35. arXiv:2201.11903
+- Chen et al. (2021) Evaluating Large Language Models Trained on Code（Codex/HumanEval）. arXiv:2107.03374
+
+**規格（ISO 等）**
+- ISO/IEC 42001:2023　AIマネジメントシステム（AIMS）
+- IEC/IEEE 82079-1:2019　利用情報（取扱説明）の作成
+- ISO/IEC 26514　システム・ソフトウェア文書
+
+**国内（査読）※自案件に合わせて追記**
+- 探し方: J-STAGE / CiNii / 情報処理学会(IPSJ) / 人工知能学会(JSAI)
+- 《著者(年)「タイトル」掲載誌, 巻(号), 頁.》
+- 《著者(年)「タイトル」掲載誌, 巻(号), 頁.》
+
+> こころえ: 出典は必ず一次情報で確認のうえ引用する。未確認の引用や、もっともらしい捏造は避ける（うそをつかない）。`;
+}
+
+function mdNegoPolite(c){
+  return `# ${c.project||"《案件名》"}　顧客折衝ポイント（揉めない和風言い換え集）
+> 言い切り・お断り・ご指摘は角が立ちやすいもの。事実は曲げず、和らげた言い回しへ置き換えるための実務フレーズ集です。
+
+## 1. 基本のこころえ
+- 事実と所感を分ける。否定ではなく代替案を添える。結論は「持ち帰る余地」を残す。
+
+## 2. 場面別の言い換え（つい言いがち → 角が立たない言い回し）
+| 場面 | つい言いがちな表現 | 角が立たない言い換え |
+|---|---|---|
+| お断り | それは無理です | いたしかねます。代わりに〇〇でしたらお力になれます |
+| やんわり断る | できません | 一度持ち帰り、検討のうえご返答いたします |
+| 追加費用 | 仕様変更は別料金です | ご要望は承ります。日程・工数への影響を添えてご相談させてください |
+| 納期 | 間に合いません | 現状では難しく、〇〇までであればお約束できます |
+| ご指摘 | それは間違いです | 認識に行き違いがあるようです。事実を整理いたします |
+| 責任の所在 | そちらの責任です | 経緯を確認し、再発を防ぐ手立てを一緒に考えます |
+| 催促 | まだですか | その後いかがでしょうか。差し支えなければ状況をお聞かせください |
+| 反論 | そうは思いません | 別の見方として〇〇も考えられますが、いかがでしょう |
+| 不明点 | 分かりません | 確かめてからお答えします（推測では申し上げません） |
+| 想定外の依頼 | 聞いていません | 初耳でしたので、前提を擦り合わせさせてください |
+| 仕様の解釈 | 言った・言わない | 認識合わせとして、要点を文章で確認させてください |
+| 値引き要求 | これ以上は無理です | ご事情は承知しました。範囲を調整して費用を抑える案をご提案します |
+| 仕様凍結 | もう変えられません | この段でいったん確定し、変更は次の区切りでまとめて反映します |
+| 進め方 | とりあえずやります | 目的と優先順位を確かめてから着手させてください |
+
+## 3. クッション言葉（添えると和らぐ）
+- 恐れ入りますが／差し支えなければ／お手数ですが／念のため／あいにくですが／申し上げにくいのですが
+
+## 4. 締めの一手
+- 「持ち帰り → 期限を切って返答」を徹底し、曖昧に流さない。お取り決めは記録に残す（会議用資料と連携）。`;
+}
+
+function mdYamato(c){
+  return `# ${c.project||"《案件名》"}　実務で使う やまと言葉（言い換え帳）
+> 漢語・カタカナを、やわらかい大和言葉へ。硬さを抜きつつ、実務で通じる範囲にとどめます。
+
+## 1. 使い方
+- 文書は正確さ優先で漢語も可。会話・前置き・気遣いはやまと言葉が効く。過度に古風にしない。
+
+## 2. 言い換え表（漢語・カタカナ → やまと言葉）
+| 元の語 | やまと言葉 | 使いどころ |
+|---|---|---|
+| 提案 | 申し出／お声がけ | 会話・メール冒頭 |
+| 検討 | 考える／思案する | 「持ち帰って考えます」 |
+| 進捗 | はかどり／進み具合 | 進み具合の確認 |
+| 課題 | お困りごと／引っかかり | ヒアリング |
+| 確認 | 確かめる／見届ける | 依頼・報告 |
+| 共有 | お伝えする／お知らせする | 連絡 |
+| 対応 | 手当て／お応えする | 顧客向け |
+| 把握 | つかむ／のみこむ | 状況説明 |
+| 懸念 | 気がかり／心配 | リスク相談 |
+| 是正 | 直す／改める | 改善 |
+| 注力 | 力を入れる／力を注ぐ | 方針 |
+| 削減 | 減らす／抑える | 効果説明 |
+| 導入 | 取り入れる／使い始める | 提案 |
+| 活用 | 役立てる／活かす | 効果 |
+| 周知 | 行き渡らせる／知らせる | 連絡 |
+| 検証 | 確かめる／試す | PoC |
+| 期日 | 締め切り／日限 | 調整 |
+| 早急 | 早めに／急ぎ | 依頼 |
+| 至急 | 大急ぎで／取り急ぎ | 連絡 |
+| 承知 | 分かりました／かしこまりました | 返事 |
+| 検収 | 受け取り確認／確かめ | 納品 |
+| 善処 | できる限りのことをする | 約束しすぎない言い方 |
+| 鑑みる | 踏まえる／考え合わせる | 説明 |
+| 齟齬 | 行き違い／食い違い | トラブル説明 |
+| 各位 | 皆さま | 宛名 |
+
+## 3. 注意（やりすぎない）
+- 専門語は無理に置き換えない（誤解の元）。社外文書は読みやすさ優先。`;
+}
+
+function mdRefs(c){
+  return `# ${c.project||"《案件名》"}　文書記載に悩んだら（参考資料集）
+> 書き方に迷ったら、公式・著名な手引きと一次情報にあたる。出典は確認のうえ引用し、捏造しない。
+
+## 1. 日本語・文章作法（公式・著名）
+- 文化庁「公用文作成の考え方」（文化審議会建議, 2022年1月）— 表記・用語・文章構成の手引
+- 共同通信社「記者ハンドブック」— 表記統一の定番
+- テクニカルコミュニケーター協会(JTCA) のガイド類 — 取扱説明・テクニカルライティング
+- textlint（OSS）— 文章の自動校正（表記ゆれ・冗長の検出）
+
+## 2. 技術文書スタイル（英語圏・著名）
+- Google developer documentation style guide
+- Microsoft Writing Style Guide
+
+## 3. おすすめ論文（生成AI／RAG／プロンプト）※検証済み
+- Vaswani et al. (2017) Attention Is All You Need. NeurIPS. arXiv:1706.03762
+- Lewis et al. (2020) Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks. NeurIPS 33. arXiv:2005.11401
+- Wei et al. (2022) Chain-of-Thought Prompting Elicits Reasoning in LLMs. NeurIPS 35. arXiv:2201.11903
+- Chen et al. (2021) Evaluating Large Language Models Trained on Code. arXiv:2107.03374
+
+## 4. Qiita / Zenn / note（探し方）
+> 個別記事はURLが変わるため、タグ検索で最新を当たり、内容は一次情報で確認する。
+- 探すタグ: 生成AI ／ プロンプトエンジニアリング ／ RAG ／ テクニカルライティング ／ Django
+- お気に入り: 《記事タイトル・URL》／《記事タイトル・URL》
+
+## 5. 規格
+- ISO/IEC 42001:2023（AIマネジメント）／ IEC/IEEE 82079-1:2019（利用情報）／ ISO/IEC 26514（ソフトウェア文書）
+
+## 6. 迷ったときの優先順位
+1. 一次情報（公式ドキュメント・規格・原典論文）
+2. 著名な手引き（上記）
+3. 二次情報（Qiita等）は裏取りしてから採用`;
+}
+
+function mdProductivity(c){
+  const ocr=state.feature.has("ocr")||state.data.has("draw")||state.data.has("form");
+  const rag=state.feature.has("rag")||state.category==="knowledge";
+  const review=state.feature.has("review");
+  const extra=[];
+  if(rag) extra.push("| 検索的中率 | 必要資料に最初に辿り着く割合 | ログ・抽出評価 |");
+  if(ocr) extra.push("| 転記時間削減 | 手入力→自動抽出の時間差 | 計測 |");
+  if(review) extra.push("| 指摘見逃し率 | 人手レビューの抜け漏れ低減 | 突合 |");
+  extra.push("| 確認時間 | 出典確認・是正にかかる時間 | 計測 |");
+  extra.push("| 教育効果 | 新人の立ち上がり日数 | 比較 |");
+  return `# ${c.project||"《案件名》"}　AIによる生産性向上 データ分析
+> 体感ではなく、数値で効果を測る。基準値 → 導入後 → 差分を、同じものさしで比べる。
+
+## 1. 測定の枠組み
+- 比較設計: 同等タスクで「AIなし（対照）／AIあり（処置）」、または導入の前後で比較。
+- 期間: 学習効果を均すため複数週で計測する。対象業務: ${c.feats.join("・")||"《対象業務》"}。
+
+## 2. 共通指標
+| 指標 | 定義 | 取り方 |
+|---|---|---|
+| 所要時間 | タスク完了までの時間 | 計測・ログ |
+| スループット | 一定期間の完了数 | 集計 |
+| 手戻り率 | 差し戻し・不具合の割合 | 記録 |
+| 品質 | レビュー指摘数・テスト合格率 | 記録 |
+| 体感 | 満足度・負担感（5段階） | アンケート |
+
+## 3. この案件向けの指標
+| 指標 | 定義 | 取り方 |
+|---|---|---|
+${extra.join("\n")}
+
+## 4. 効果測定シート（記入）
+| 区分 | AIなし（基準） | AIあり | 差分・改善率 |
+|---|---|---|---|
+| 平均所要時間 | 《》 | 《》 | 《》 |
+| 完了数 / 週 | 《》 | 《》 | 《》 |
+| 手戻り率 | 《》 | 《》 | 《》 |
+| 確認時間 | 《》 | 《》 | 《》 |
+| 体感（5段階） | 《》 | 《》 | 《》 |
+
+## 5. ROIの内訳
+| 項目 | 算式 | 値 |
+|---|---|---|
+| 削減工数 | （基準時間−AI時間）× 件数 | 《》 |
+| 金額換算 | 削減工数 × 人件費単価 | 《》 |
+| 導入・運用コスト | ライセンス＋構築＋運用 | 《》 |
+| 回収期間 | コスト ÷ 月間削減額 | 《Nヶ月》 |
+
+## 6. 参考研究（外部・検証済み）
+- Peng et al. (2023) The Impact of AI on Developer Productivity: Evidence from GitHub Copilot. arXiv:2302.06590 ― 統制実験で、処置群がHTTPサーバ実装タスクを対照群より約 55.8% 速く完了。
+> 注: 効果はタスク・習熟度で大きく変わる。外部値の流用は避け、自組織の数値で必ず検証する。`;
+}
+
+function mdWbs(c){
+  const term=c.term||"8週間";
+  const rows=wbsTasks(c).map(t=>`| ${t.no} | ${t.task} | 《》 | 《》 | 《》 | 《》 | 《》 | 《》 | 《》 | 0 | (自動) | (自動) | 《毎日記入》 |`).join("\n");
+  return `# ${c.project||"《案件名》"}　WBS（作業分解構成）— Excel時短ひな型
+> この章を「Excel」で書き出すと、自動計算つきのWBSになります（「遅れ(日)」「状態」は数式、進捗・工数・日付は手入力）。
+
+## 1. 使い方（自動計算 / 手動計算）
+- 自動: Excelの「遅れ(日)」は **実績完了 − 予定完了**（未完で予定超過なら 本日 − 予定完了）。「状態」は進捗%から判定。
+- 手動: 数式を上書きすれば手入力（手動計算）に切り替えられます。
+- 色付け: 担当に「自分」と入れた行は自動でピンク、**遅れが出た（遅れ>0）行**は自動で橙に色付き（条件付き書式）。
+- 出力: ツールバー「この章を保存 ▾ → Excel」。一式xlsxにもWBSと「遅延理由ログ」シートが入ります。
+
+## 2. WBS（全${term}）
+| No | 作業 | 担当 | 予定開始 | 予定完了 | 予定工数 | 実績開始 | 実績完了 | 実績工数 | 進捗% | 遅れ(日) | 状態 | 遅延理由 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+${rows}
+
+## 3. マイルストーン
+| M | 節目 | 目安 |
+|---|---|---|
+| M1 | データ受領完了 | 《》 |
+| M2 | 一次パイプライン稼働 | 《》 |
+| M3 | 合格ライン到達の判定 | 《》 |
+| M4 | 報告・Go / No-Go | 《》 |
+
+## 4. 進捗の見方
+- 予定 vs 実績を同じ表で並べ、差（遅れ）を毎日更新する。遅れは早期ほど取り返しやすい。
+- 進捗%は全体の体感ではなく、作業ごとの達成度で入れる。
+
+## 5. 遅延対応（毎日）
+- 遅れが出た作業は、**遅延理由ログ**に「日付・対象No・理由・対応・担当」を毎日記録する。
+- 理由を残すと、再発防止とお客様への説明（事実ベース）に効く。`;
+}
+
+function mdNewbie(c){
+  return `# ${c.project||"《案件名》"}　新人サポート・お仕事お任せシート
+> 得意・不得意を見える化し、3つの信号でステータスを揃える。任せる / 支えるを、事実ベースで判断する。
+
+## 1. 3信号の見方
+| 信号 | 状態 | 意味 | 動き |
+|---|---|---|---|
+| 🟢 | 問題ない | 自走できる | 任せて見守る |
+| 🟡 | サポート必要 | 一部つまずく | 要点だけ伴走 |
+| 🔴 | 大変 | 抱え込み気味 | 早めに一緒に・小さく分ける |
+
+## 2. 得意・不得意マップ
+| 領域 | 得意 / 不得意 | 信号 | ひとことメモ |
+|---|---|---|---|
+| 例）Linux基本 | 得意 | 🟢 | 自走OK |
+| 例）Django | 不得意 | 🟡 | 要点だけ伴走 |
+| 《領域》 | 《得意/不得意》 | 《🟢/🟡/🔴》 | 《》 |
+| 《領域》 | 《》 | 《》 | 《》 |
+
+## 3. お任せ計画（権限委譲）
+| タスク | 任せ方 | 信号 | 期限 | フォロー |
+|---|---|---|---|---|
+| 《タスク》 | 丸ごと / 一部 / 伴走 | 《🟢/🟡/🔴》 | 《》 | 《いつ確認》 |
+| 《タスク》 | 《》 | 《》 | 《》 | 《》 |
+
+## 4. 任せるときのこころえ
+- 目的とゴールを先に共有し、やり方は任せる。詰まりは早めに相談できる空気を保つ。
+- 🔴は責めない。仕事を小さく分け、最初の一歩だけ一緒に。`;
+}
+
+function mdInstr(c){
+  return `# ${c.project||"《案件名》"}　上位指示メモ（5W1H）と会議
+> 受けた指示を5W1Hで取り違えなく書き留め、朝会・中間・夕会・一人MTGで進みをそろえる。
+
+## 1. 上位指示メモ（5W1H）
+| 項目 | 内容 |
+|---|---|
+| Why（なぜ） | 《目的・背景》 |
+| What（何を） | 《成果物・対象》 |
+| Who（誰が・誰に） | 《担当・関係者》 |
+| When（いつ） | 《期限・節目》 |
+| Where（どこで） | 《対象範囲・環境》 |
+| How（どう） | 《進め方・制約》 |
+| 復唱・確認 | 《認識合わせの一文》 |
+
+## 2. 朝会（けさのMTG）
+| 区分 | 内容 |
+|---|---|
+| 今日やること（3つまで） | 《》 |
+| 気がかり | 《》 |
+| 依頼したいこと | 《》 |
+
+## 3. 中間（ひるのMTG）
+- 予定どおりか確認し、ずれたら理由と立て直しを一行で。《》
+
+## 4. 夕会（ゆうべのMTG）
+| 区分 | 内容 |
+|---|---|
+| できたこと | 《》 |
+| 持ち越し（理由） | 《》 |
+| 明日の一手 | 《》 |
+
+## 5. 一人MTG（ふりかえり・KPT）
+| 区分 | 内容 |
+|---|---|
+| K 続ける | 《》 |
+| P やめる | 《》 |
+| T 試す | 《》 |
+> 事実 → 気づき → 次の一歩 の順で、3行に。`;
+}
+
+function mdGlossary(c){
+  const ocr=state.feature.has("ocr")||state.data.has("draw")||state.data.has("form");
+  const rag=state.feature.has("rag")||state.category==="knowledge";
+  const seeds=[
+    "| RAG | ラグ | AI | 検索した根拠を添えて回答する仕組み | 社内文書QA | 検索拡張生成 |",
+    "| PoC | ピーオーシー | 一般 | 効果や実現性を小さく試して検証する | 導入判断の前段 | 概念実証 |",
+    "| ハルシネーション | — | AI | もっともらしいが誤った生成 | 出典確認で抑える | 作話・幻覚 |",
+    "| プロンプト | — | AI | AIへの指示文 | 役割・制約・出力形式 | 指示文 |"
+  ];
+  if(rag){ seeds.push("| Embedding | エンベディング | AI | 文章を数値ベクトルに変換 | 類似検索の基盤 | 埋め込み |"); seeds.push("| ベクトルDB | — | AI | ベクトルを索引・検索する保管庫 | 関連文書の取得 | ベクタストア |"); }
+  if(ocr){ seeds.push("| OCR | オーシーアール | データ | 画像から文字を読み取る | 図面・帳票の取り込み | 文字認識 |"); }
+  return `# ${c.project||"《案件名》"}　業界用語辞典（Excel向け）
+> 案件で飛び交う用語を、読み・意味・使いどころで揃える。この章はExcel / CSVで辞典として書き出せます。
+
+## 1. 使い方
+- 下の表に用語を足す → ツールバー「この章を保存 ▾ → Excel」または「CSV」。
+- 五十音や英字で並べ替え、共有して用語の揺れを防ぐ。
+
+## 2. 用語辞典
+| 用語 | 読み | 区分 | 意味 | 使いどころ・例 | 言い換え・別称 |
+|---|---|---|---|---|---|
+${seeds.join("\n")}
+| 《用語》 | 《読み》 | 《区分》 | 《意味》 | 《例》 | 《別称》 |
+| 《用語》 | 《読み》 | 《区分》 | 《意味》 | 《例》 | 《別称》 |
+
+## 3. 運用ルール
+- 出典のある一次情報で定義する（曖昧な用語は《要確認》）。社外向けは平易な言い換えも併記。`;
+}
+
+function mdReview(c){
+  return `# ${c.project||"《案件名》"}　AI設計書レビュー（運用）
+> 設計書などを多角的に点検する。観点を**5段階で採点**し、**理由つきカイゼンアクション**と**参考記事**を返す。AIレビューは**アーティファクトでは☑だけ（APIキー不要・Claude内蔵）**、単体HTMLでは**APIキー**を設定して実行できる。送信前に必ず安全確認を。
+
+## 0. 使う前の安全確認（必須）
+> 上の操作パネルで3つの確認に同意するまで、外部AI用プロンプトのコピーはできません。
+- この内容を外部AIに渡してよいか、社内規程・お客様との取り決めを確認した。
+- 機密・個人情報・図番等の固有情報を含まない（または匿名化した）。
+- 外部AIの利用が許可された環境・アカウントである。
+> 迷うときは渡さない。下の観点チェックだけでも、オフラインで十分なレビューになります。
+
+## 1. レビューの観点（共通）
+- 結論先・根拠・抜け漏れ・リスク・読みやすさ・約束しすぎ・運用 / セキュリティ。
+
+## 2. モード（8種）
+| モード | ねらい | 口調 |
+|---|---|---|
+| ①優しい・学び | 励ましつつ学べる | やさしい |
+| ②実務・厳しいが真剣 | 妥協なく抜け漏れ指摘 | 率直（成果物に対して） |
+| ③上司レビュー前 | 突っ込まれる前の自己点検 | 先回り |
+| ④新人サポート | 用語をやさしく次の一歩 | 安心 |
+| ⑤お客様 | 社外に出してよいか | わかりやすさ重視 |
+| ⑥商用運用・移行 | PoC → 本番の懸念 | 慎重 |
+| ⑦その他（自由設定） | 観点を自由に | 任意 |
+| ⑧コンサル | 論点を構造化 | みやびで論理的 |
+
+## 3. 出力の型（プロンプトに含む）
+- 総評 / よい点 / 気になる点（重大度＋理由）/ **カイゼンアクション（理由つき）** / **参考記事** / 確認したいこと《》。
+
+## 4. 手法（査読研究にもとづく強化）
+- **多観点で読む**（Perspective-Based Reading）: 立場を変えると欠陥発見が増える。→ モード⑨「多観点（PBR）」。
+  - Basili et al. (1996) Empirical Software Engineering 1(2):133–164 ／ Fagan (1976) IBM Systems Journal 15(3).
+- **観点チェック**（インスペクション）: チェックリストで見落としを減らす。→ 本章の採点観点。
+- **自己批判→改善**（Self-Refine）: 下書きを自己点検して直す。→ 「二段レビュー」トグル。
+  - Madaan et al. (2023) arXiv:2303.17651（反復改善で品質向上）。
+- **ルーブリック採点**（LLM-as-a-judge / G-Eval）: 1〜5の明示基準で採点。ただし位置・冗長・自己優遇のバイアスに注意し、最終判断は人。
+  - Zheng et al. (2023) arXiv:2306.05685 ／ Liu et al. (2023) arXiv:2303.16634.
+- **使い分け指針**: 軽い章はチェックリスト型、重い設計書は多観点（PBR）。
+  - Thelin, Runeson, Wohlin (2003) IEEE TSE 29(8):687–704 ／ Basili et al. (1996).
+- **インスペクション工程（ミニ）**: ①個人読み（観点で採点）→ ②指摘の集約（重複統合）→ ③確認（対策・担当を決める）。
+  - Fagan (1976) IBM Systems Journal 15(3):182–211 ／ Porter, Votta, Basili (1995) IEEE TSE 21(6):563–575.
+- **重み付け採点・しきい値**: 重要観点を×2〜3、総合<3 か 重大度「高」1件で「提出前に要修正」。
+- **自己×AI採点の差分／順序入替の二重採点**: 乖離≥2は要協議、順序を変えて差が大きければ位置バイアス注意（Zheng 2023）。
+- **国内文献**: 情報処理学会(IPSJ)・電子情報通信学会(IEICE) の「インスペクション／レビュー」論文は J-STAGE・CiNii で検索し、正確な書誌を確認のうえ引用（《要確認》、捏造しない）。
+
+## 5. こころえ
+- AIの指摘は叩き台。最終判断は人。事実と所感を分け、捏造を疑い、出典で確かめる。`;
+}
+
+function mdAcademy(c){
+  return `# ${c.project||"《案件名》"}　学びの教室 — 文系の方も、実務で
+> やさしく、みやびに。手を動かしながら学ぶ。一次情報（公式・査読論文・README）で確かめ、捏造しない。
+
+## 1. この教室のすすめ方（文系向け）
+- 数式より、まず動かす。README を読む → 写経 → 小さく試す → 自分の言葉にする。
+- 四段で噛みくだく: 定義 → たとえ → 詳細 → 一言。困ったら用語辞典（第二十三）へ。
+
+## 2. 学びの地図（4本の柱）
+| 柱 | これは何 | 最初の一歩 |
+|---|---|---|
+| AIエージェント | 目標へ向け、自分で道具を使い手順を進めるAI | 小さな自動化を1つ作る |
+| プロンプトエンジニアリング | AIへの伝え方の工夫 | 役割・制約・例示・出力形式 |
+| ハーネスエンジニアリング | AIを動かす「足回り」（道具接続・制御・評価） | 評価ハーネスをREADMEで動かす |
+| データ分析 | 事実を数字で確かめる | 表計算 → pandasで集計 |
+
+## 3. AIエージェント
+- 公式記事: Anthropic「Building Effective Agents」 https://www.anthropic.com/research/building-effective-agents
+- 査読・著名論文:
+  - Yao et al. (2022) ReAct: Synergizing Reasoning and Acting in Language Models. arXiv:2210.03629
+  - Schick et al. (2023) Toolformer: Language Models Can Teach Themselves to Use Tools. arXiv:2302.04761
+  - Shinn et al. (2023) Reflexion: Language Agents with Verbal Reinforcement Learning. arXiv:2303.11366
+- 実務の一歩: 「考える → 道具を使う → 結果を見て直す」のループを、身近な作業1つで再現する。
+
+## 4. プロンプトエンジニアリング
+- 公式: Anthropic プロンプトエンジニアリング https://docs.claude.com/en/docs/build-with-claude/prompt-engineering/overview
+- 記事: Prompt Engineering Guide（DAIR.AI） https://www.promptingguide.ai/
+- 論文: Wei et al. (2022) Chain-of-Thought Prompting. arXiv:2201.11903
+- 型: 役割 → 制約 → 例示（Few-shot）→ 出力形式（表 / JSON）→ 検証。困ったら第八（プロンプト設計シート）。
+
+## 5. ハーネスエンジニアリング（足回り）
+- 意味: モデル本体ではなく、その周り（ツール接続・制御ループ・ガードレール・評価）を設計すること。
+- READMEで学ぶ: EleutherAI lm-evaluation-harness https://github.com/EleutherAI/lm-evaluation-harness
+- 評価の論文: Chen et al. (2021) Evaluating Large Language Models Trained on Code（HumanEval）. arXiv:2107.03374
+- 実務の一歩: 小さな評価セットを作り、出力を採点して改善（第十九の指標・第二十四のレビューと連携）。
+
+## 6. データ分析（文系でも）
+- 公式: pandas https://pandas.pydata.org/docs/ ／ scikit-learn https://scikit-learn.org/
+- 学び: Kaggle Learn https://www.kaggle.com/learn
+- 一歩: 表計算で集計 → pandasで同じことを再現 → グラフで「事実」を見る。
+
+## 7. READMEで学ぶ（ローカル）
+1. リポジトリを clone（または zip を展開）。
+2. README を読む（前提・インストール・最小例）。
+3. 最小例を写経して動かす。
+4. 値を1つ変えて、違いを観察する。
+5. 学びを一言メモ（用語辞典へ追記）。
+> ローカルで完結する範囲で。秘密情報は外に出さない（第七 データフロー・第二十四 安全確認）。
+
+## 8. クライアントのための「学びの教室」
+> お客様自身がAIを使いこなせるよう、みやびに伴走する。
+| 段 | やること | 渡すもの |
+|---|---|---|
+| ①現状把握 | お困りごとと得意を聞く | ヒアリング（第十六・第二十一） |
+| ②小さな成功 | 1つだけ一緒に成功体験 | プロンプト設計シート（第八） |
+| ③型を渡す | 再現できる型にする | 手順書（第十二）・用語辞典（第二十三） |
+| ④ふりかえり | 学びを言葉にする | KPT（第二十二） |
+- こころえ: 専門用語はやさしく、お客様の言葉で。「できた」を一緒に喜ぶ。
+
+## 9. こころえ
+- 出典は一次情報で確かめ、URL・論文は正確に。曖昧なものは《要確認》。手を動かして覚える。`;
+}
+
+function mdFblog(c){
+  return `# ${c.project||"《案件名》"}　FB記録（フィードバック・ログ）— Excel時短
+> 受けたフィードバックを、その場で1行記録。Excel / CSVで台帳として書き出せます。
+
+## 1. 使い方
+- 1件1行で下の表に追記 → ツールバー「この章を保存 ▾ → Excel」または「CSV」。
+- 「区分」で並べ替えると、良かった点／改善点が一目で分かる。
+
+## 2. FBログ
+| No | 日付 | 相手・出所 | 区分 | 内容（FB） | 重大度 | 対応・カイゼン | 状態 |
+|---|---|---|---|---|---|---|---|
+| 1 | 《》 | 《お客様/上司/同僚》 | 良かった点 | 《》 | 低 | 伸ばす | 完了 |
+| 2 | 《》 | 《》 | 改善点 | 《》 | 中 | 《対策》 | 対応中 |
+| 3 | 《》 | 《》 | 要望 | 《》 | 《高/中/低》 | 《》 | 未対応 |
+| 4 | 《》 | 《》 | 不具合 | 《》 | 《》 | 《》 | 《未対応/対応中/完了》 |
+
+## 3. こころえ
+- 良かった点も必ず記録して伸ばす。改善点は理由とセットで、事実と所感を分ける。`;
+}
+
+function mdClientmtg(c){
+  return `# ${c.project||"《案件名》"}　顧客MTG記録 — Excel時短
+> 打ち合わせを定型で記録。決定事項・宿題を取り違えず、Excelで台帳化。
+
+## 1. 今回のMTG
+| 項目 | 内容 |
+|---|---|
+| 日時 / 場所 | 《》 |
+| 出席（先方 / 自社） | 《》 |
+| 目的 | 《》 |
+| 要旨（3行） | 《》 |
+
+## 2. 議事（決定・宿題）
+| No | 区分 | 内容 | 担当 | 期限 | 状態 |
+|---|---|---|---|---|---|
+| 1 | 決定 | 《》 | 《》 | — | 確定 |
+| 2 | 宿題 | 《》 | 《自社/先方》 | 《》 | 対応中 |
+| 3 | 懸念 | 《》 | 《》 | 《》 | 確認中 |
+| 4 | 次回 | 《》 | — | 《日程》 | 予定 |
+
+## 3. 次回への引き継ぎ
+- 次回日程: 《》／持ち越し: 《》／お願い: 《》
+
+## こころえ
+- 決定事項は「誰が・いつ・何を」を必ず。後日の行き違いを未然に防ぐ。`;
+}
+
+function mdKanban(c){
+  return `# ${c.project||"《案件名》"}　和風カンバン（作業札）— Excel時短
+> 作業を「札」にして、進み具合のレーンで動かす。「レーン」で並べ替えれば簡易ボードに。
+
+## 1. レーン（進み具合）
+| レーン | 意味 |
+|---|---|
+| 未着手 | これから取りかかる |
+| 着手中 | いま手をつけている |
+| 確認待ち | レビュー・承認待ち |
+| 仕上り | 完了 |
+
+## 2. 作業札（カンバン）
+| No | 札（作業） | 担当 | レーン | 優先 | 期限 | メモ |
+|---|---|---|---|---|---|---|
+| 1 | 《作業》 | 《》 | 未着手 | 高 | 《》 | 《》 |
+| 2 | 《作業》 | 《》 | 着手中 | 中 | 《》 | 《》 |
+| 3 | 《作業》 | 《》 | 確認待ち | 中 | 《》 | 《》 |
+| 4 | 《作業》 | 《》 | 仕上り | 低 | 《》 | 《》 |
+
+## 3. 使い方・こころえ
+- Excelで「レーン」を並べ替えると、未着手 → 着手中 → 確認待ち → 仕上り の簡易ボードに。
+- WIP（着手中）は増やしすぎない。1人が同時に持つ札は2〜3枚まで。終わらせてから次を取る。`;
+}
+
+function mdKaizenmtg(c){
+  return `# ${c.project||"《案件名》"}　カイゼンMTG（ふりかえり）
+> 小さく早く直す。事実 → 原因 → 対策 → 担当 → 期限。人ではなく仕組みを直す。
+
+## 1. 今回のテーマ・事実
+| 項目 | 内容 |
+|---|---|
+| テーマ | 《》 |
+| 事実（数値で） | 《》 |
+| 影響 | 《》 |
+
+## 2. カイゼン項目
+| No | 課題（事実） | 原因（なぜ×5） | 対策 | 担当 | 期限 | 効果指標 |
+|---|---|---|---|---|---|---|
+| 1 | 《》 | 《》 | 《》 | 《》 | 《》 | 《》 |
+| 2 | 《》 | 《》 | 《》 | 《》 | 《》 | 《》 |
+
+## 3. ふりかえり（KPT）
+| 区分 | 内容 |
+|---|---|
+| K 続ける | 《》 |
+| P やめる | 《》 |
+| T 試す | 《》 |
+
+## こころえ
+- 人ではなく仕組みを直す。対策は1〜2個に絞り、効果は数値で確認（第十九 生産性データと連携）。`;
+}
+
+function mdMtg(c){
+  return `# ${c.project||"《案件名》"}　会議用資料（キックオフ）
+> 本紙は、関係各位の見立てを一つに揃え、後日の行き違いを未然に防ぐための覚書にございます。お取り決めはこの紙へ記し、双方にて確と保管いたします。
+
+## 1. 本会合の主旨（キックオフ）
+- PoCの狙いと到達点を分かち合い、進め方の合意を交わす。
+- 「何をもって成就とみなすか／然らざる場合の見極め」を先に定める。
+- お役目・ご連絡の作法・お取り決めを確かめる。
+
+## 2. ご出席・お役目
+| お名前 | ご所属・お役目 | ご連絡 |
+|---|---|---|
+| 《お名前》 | 《PoCリード（当方）》 | 《メール／電話》 |
+| 《お名前》 | 《ご担当窓口》 | 《》 |
+| 《お名前》 | 《現場ご有識者（SME）》 | 《》 |
+
+## 3. 本日の次第
+1. ご挨拶・お引き合わせ
+2. 背景と目的の共有（${c.cat}／対象: ${c.data.join("・")||"《対象データ》"}）
+3. 成就の見立てと、見送りの線引き
+4. 進め方・お役目・日程（全${c.term}）
+5. データご提供と取り扱いのお取り決め
+6. ご連絡・ご報告の作法
+7. 宿題（ToDo）の確認
+
+## 4. 何をもって成就とみなすか（成功の見立て）
+| 区分 | あらまし（状態） | 次の所作 |
+|---|---|---|
+| 成就 | ${c.acc}を満たし、現場のご評価も良好 | 本番設計へ歩を進める |
+| 道半ば | 一部未達なれど見込みあり | 因（データ/プロンプト/モデル）を一つずつ手直し |
+| 見送り | 手直しを経てなお及ばず／前提が崩れる | 範囲を改める、もしくは潔く見送りを協議 |
+> 主たるものさしは **${c.acc}**。加えて、根拠のご提示と応答の速さが実務に耐えること。
+
+## 5. 何をもって及ばずとみなすか（失敗の線引き）
+> 「曖昧なまま続けない」を、本日のお取り決めといたします。
+| 及ばずの兆し | 想定される因 | とるべき所作 |
+|---|---|---|
+| 検索が的を外す | 文書の刻み方・索引・問いの広げ方 | 前処理と検索設計を見直す |
+| 検索は当たるが答えが誤る | 指示文・出力の縛り | プロンプトを一要素ずつ手直し |
+| 特定の様式だけ弱い | OCR・構造化の精度 | 前処理を疑い、代表様式を評価に足す |
+| 因を質しても改善せず | 技術／データの限界 | 範囲縮小・中止を率直に協議 |
+
+## 6. お取り決め（後日の行き違いを未然に防ぐ確認事項）
+- **境界**: 本PoCで「行うこと／行わぬこと」を明文といたします。
+- **データ**: ご提供の時期・範囲・取り扱い（外部送信の可否）を取り決めます。
+- **正解づくり**: 評価の正解は、ご有識者のお力添えを前提といたします。
+- **見込み**: 精度は「叩き台からの手直し」で育つ旨を分かち合い、過度なご期待を戒めます。
+- **ご変更**: 途中のご変更は、日程・工数への響きを添えて、協議のうえで承ります。
+
+| お取り決め事項 | 合意の内容 | 取り決めの日 |
+|---|---|---|
+| スコープ（行うこと） | 《合意内容》 | 《YYYY-MM-DD》 |
+| スコープ（行わぬこと） | 《合意内容》 | 《》 |
+| データ取り扱い | 《外部送信の可否・範囲》 | 《》 |
+| 正解づくりの分担 | 《SMEのお力添えの範囲》 | 《》 |
+
+## 7. 議事の記録（誰が・いつ・何時に・何を）
+> 言った言わぬを避けるため、ご発言と決め事を、日時とともに書き留めます。
+| 日時 | ご発言者・お役目 | 要旨・ご発言 | 決定 / 宿題 |
+|---|---|---|---|
+| 《YYYY-MM-DD HH:MM》 | 《お名前》 | 《要旨》 | 《決定 or 宿題》 |
+| 《YYYY-MM-DD HH:MM》 | 《お名前》 | 《要旨》 | 《》 |
+| 《YYYY-MM-DD HH:MM》 | 《お名前》 | 《要旨》 | 《》 |
+
+## 8. 宿題（ToDo）と期限
+| 宿題 | ご担当 | 期限 | 状況 |
+|---|---|---|---|
+| 評価用データのご提供 | 《ご担当》 | 《YYYY-MM-DD》 | 未着手 |
+| 正解づくりの基準合わせ | 《SME》 | 《》 | 未着手 |
+| 環境・基盤（${c.llm||"《基盤》"}）のご確認 | 《当方》 | 《》 | 未着手 |
+
+## 9. 次回のお約束
+- 日時: 《YYYY-MM-DD HH:MM》
+- 議題: 進捗と、評価の初期所見の共有
+- 形式: 《対面 / オンライン》`;
+}
+
+const GENERATORS = {plan:mdPlan, req:mdReq, archspec:mdArchspec, arch:mdArch, detail:mdDetail, impl:mdImpl, dataflow:mdDataflow, prompt:mdPrompt, test:mdTest, eval:mdEval, ops:mdOps, manual:mdManual, risk:mdRisk, mtg:mdMtg, study:mdStudy, negopolite:mdNegoPolite, yamato:mdYamato, refs:mdRefs, productivity:mdProductivity, wbs:mdWbs, newbie:mdNewbie, instr:mdInstr, glossary:mdGlossary, docreview:mdReview, academy:mdAcademy, fblog:mdFblog, clientmtg:mdClientmtg, kanban:mdKanban, kaizenmtg:mdKaizenmtg};
+/* ---- WHY → WHAT → HOW（各章冒頭の記入欄） ---- */
+function whyWhatHow(c, id){
+  const map={
+    plan:   {w:"属人化・工数・品質ばらつきといった課題を、AIで解消する狙い", t:"PoCで「使える精度が出るか」を見極める範囲", h:"小さく作って評価で確かめ、Go / No-Go を判断"},
+    req:    {w:"検証に要る要件だけを見極め、過不足をなくす狙い", t:"満たすべき機能・非機能（精度 / 性能 / 安全）", h:"PoC範囲に絞り、本番要件は次フェーズへ送る"},
+    arch:   {w:"なぜこの構成が課題に合うのか、の拠りどころ", t:"取り込み〜前処理〜検索〜生成〜評価の構成要素", h:"最小構成で組み、精度の検証に資源を集中"},
+    prompt: {w:"ハルシネーションを抑え、根拠ある回答にする狙い", t:"役割・制約・入出力スキーマ・ガードレール", h:"評価セットと対で、一要素ずつ改善（版管理）"},
+    eval:   {w:"「なんとなく良い」を排し、数値で判断する狙い", t:"正確性・網羅性・根拠性・安全性・実用性", h:"評価セットを固定し、改善 → 再評価を反復"},
+    risk:   {w:"期待値を揃え、後日の行き違いを未然に防ぐ狙い", t:"主要リスク・前提・依存・やらないこと", h:"影響度 × 可能性で優先し、対策を先に取り決める"},
+    mtg:    {w:"関係者の見立てを一つに揃え、合意を交わす狙い", t:"成功 / 失敗の線引き・お取り決め・宿題", h:"次第に沿って進め、決定と発言を日時で記録"},
+    archspec:{w:"全体構造の方針を先に固め、各設計のぶれを防ぐ狙い", t:"システム概要・構成方針・コンポーネント・IF", h:"非機能を起点に構成を定め、詳細は下位文書へ"},
+    detail: {w:"内部処理を曖昧さなく実装可能な粒度に落とす狙い", t:"処理シーケンス・モジュール・データ構造・内部API", h:"主要フローを分解し、入出力とエラーを明文化"},
+    impl:   {w:"実装の作法を揃え、属人化と手戻りを防ぐ狙い", t:"言語・構成・依存・規約・環境変数", h:"規約とテスト方針を先に定め、CIで担保"},
+    dataflow:{w:"データの流れと機微情報の扱いを明確にする狙い", t:"データ一覧・変換ステップ・保管・監査", h:"源泉→加工→出力→保管を一本で追えるように"},
+    test:   {w:"品質を数値と項目で保証し、抜け漏れを防ぐ狙い", t:"テスト種別・ケース・精度テスト・完了基準", h:"観点ごとにケース化し、合否を記録して判定"},
+    ops:    {w:"本番運用を止めない体制と手順を定める狙い", t:"体制・SLO・監視・障害対応・更新運用", h:"監視としきい値を決め、障害フローを先に用意"},
+    manual: {w:"はじめての方でも迷わず操作できるようにする狙い", t:"準備・基本操作・FAQ・問い合わせ", h:"専門用語を避け、手順を一歩ずつ案内"},
+    study:  {w:"現場の課題を生成AI活用で前に進める人材を育てる狙い", t:"ニーズ把握・研修カリキュラム・新規企画・参考文献", h:"演習中心で、評価・修正力とプロンプト設計を伝授"},
+    negopolite:{w:"角を立てず、事実は曲げずに折衝を進める狙い", t:"場面別の言い換え・クッション言葉", h:"否定でなく代替案、持ち帰って期限を切って返答"},
+    yamato: {w:"硬さを抜き、伝わりやすくする狙い", t:"漢語・カタカナ→やまと言葉の対応", h:"会話・気遣いはやまと言葉、専門語は無理に置換しない"},
+    refs:   {w:"書き方の迷いを一次情報で素早く解く狙い", t:"公式手引・論文・Qiita・規格", h:"一次情報→著名手引→二次情報の順に当たる"},
+    productivity:{w:"体感でなく数値で効果を判断する狙い", t:"指標・効果測定シート・ROI", h:"基準→導入後→差分を同じものさしで比較"},
+    wbs:    {w:"作業を分解し、見積と担当を見える化する狙い", t:"WBS・マイルストーン", h:"Excelに書き出してそのまま運用、依存を必ず埋める"},
+    newbie: {w:"得意/不得意を見える化し、任せる・支える判断を揃える狙い", t:"3信号ステータス・得意不得意・お任せ計画", h:"🟢任せる🟡伴走🔴一緒に、責めずに小さく分ける"},
+    instr:  {w:"指示を取り違えず、日々の進みをそろえる狙い", t:"5W1H指示メモ・朝/中間/夕会・一人MTG", h:"5W1Hで復唱確認、KPTで一日を締める"},
+    glossary:{w:"用語の揺れをなくし、認識を合わせる狙い", t:"用語・読み・意味・使いどころ", h:"一次情報で定義、Excelで辞典として共有"},
+    docreview:{w:"設計書を採点・カイゼン・参考記事で点検する狙い", t:"採点フィードバック・8モード・安全確認・AI実行", h:"観点を採点しAIで点検、アーティファクトは☑だけ"},
+    academy:{w:"文系の方も実務で使えるよう、やさしく学ぶ狙い", t:"4本柱・公式/論文・READMEで学ぶ・クライアント教室", h:"一次情報で確かめ、手を動かして覚える"},
+    fblog:  {w:"フィードバックを台帳化し、伸ばす/直すを見える化する狙い", t:"日付・出所・区分・内容・対応・状態", h:"良かった点も記録、改善は理由とセットでExcel化"},
+    clientmtg:{w:"打合せの決定・宿題を取り違えない狙い", t:"日時/出席/目的・議事・引き継ぎ", h:"誰が・いつ・何を を必ず、Excelで台帳化"},
+    kanban: {w:"作業の進み具合を札で見える化する狙い", t:"レーン・作業札・優先・期限", h:"レーンで並べ替えて簡易ボード、WIPを絞る"},
+    kaizenmtg:{w:"小さく早く直し、再発を防ぐ狙い", t:"事実・原因・対策・KPT", h:"人でなく仕組みを直し、効果を数値で確認"},
+  };
+  let m=map[id]||{w:"取り組む狙い", t:"対象とすること", h:"進め方"};
+  if(id==="plan" && c.pain) m=Object.assign({},m,{w:"「"+c.pain+"」を、AIで解消する狙い"});
+  const B="《　　　　　　　　　　　　　》";
+  return `## 0. WHY → WHAT → HOW（記入）
+> まず「なぜ(Why) → 何を(What) → どう(How)」の順に、芯を一行で固めます。ここが揃えば、以降の章がぶれません。
+
+**WHY（なぜ取り組むか）**
+- ねらい（たたき台）: ${m.w}
+- ご記入: ${B}
+
+**WHAT（何をするか）**
+- 対象（たたき台）: ${m.t}
+- ご記入: ${B}
+
+**HOW（どう実現するか）**
+- 進め方（たたき台）: ${m.h}
+- ご記入: ${B}`;
+}
+function injectWWH(md, id, c){
+  const block=whyWhatHow(c, id);
+  const i=md.indexOf("\n## ");
+  return i<0 ? (md+"\n\n"+block) : (md.slice(0,i)+"\n\n"+block+md.slice(i));
+}
+
+/* ════════════════════════ Markdown → HTML（簡易） ════════════════════════ */
+function mdToHtml(md, docId){
+  const lines = md.split("\n");
+  let html="", i=0, inTable=false, inCode=false, codeBuf=[];
+  const flushTable=(rows)=>{
+    if(!rows.length) return "";
+    const cells = r=>r.split("|").slice(1,-1).map(x=>x.trim());
+    const head = cells(rows[0]);
+    const body = rows.slice(2).map(cells);
+    let t="<table><thead><tr>"+head.map(h=>`<th>${inline(h)}</th>`).join("")+"</tr></thead><tbody>";
+    body.forEach(b=>{ t+="<tr>"+b.map(c=>`<td>${inline(c)}</td>`).join("")+"</tr>"; });
+    return t+"</tbody></table>";
+  };
+  let tableRows=[], listBuf=[], listType="";
+  const flushList=()=>{ if(listBuf.length){ html+=`<${listType}>`+listBuf.map(li=>`<li>${inline(li)}</li>`).join("")+`</${listType}>`; listBuf=[]; listType=""; } };
+  const flushTbl=()=>{ if(tableRows.length){ html+=flushTable(tableRows); tableRows=[]; } };
+
+  for(i=0;i<lines.length;i++){
+    let ln=lines[i];
+    if(ln.trim().startsWith("```")){
+      if(inCode){ html+=`<pre>${esc(codeBuf.join("\n"))}</pre>`; codeBuf=[]; inCode=false; }
+      else { flushList(); flushTbl(); inCode=true; }
+      continue;
+    }
+    if(inCode){ codeBuf.push(ln); continue; }
+
+    if(/^\s*\|.*\|\s*$/.test(ln)){ flushList(); tableRows.push(ln); continue; } else flushTbl();
+
+    if(/^#\s/.test(ln)){ flushList(); html+=titleBlock(ln.replace(/^#\s/,""), docId); continue; }
+    if(/^##\s/.test(ln)){ flushList(); html+=`<h2>${inline(ln.replace(/^##\s/,""))}</h2>`; continue; }
+    if(/^###\s/.test(ln)){ flushList(); html+=`<h3>${inline(ln.replace(/^###\s/,""))}</h3>`; continue; }
+    if(/^>\s?/.test(ln)){ flushList(); html+=`<blockquote>${inline(ln.replace(/^>\s?/,""))}</blockquote>`; continue; }
+    if(/^[-*]\s/.test(ln)){ if(listType!=="ul"){flushList();listType="ul";} listBuf.push(ln.replace(/^[-*]\s/,"")); continue; }
+    if(/^\d+\.\s/.test(ln)){ if(listType!=="ol"){flushList();listType="ol";} listBuf.push(ln.replace(/^\d+\.\s/,"")); continue; }
+    if(/^---\s*$/.test(ln)){ flushList(); html+="<hr>"; continue; }
+    if(ln.trim()===""){ flushList(); continue; }
+    flushList();
+    html+=`<p>${inline(ln)}</p>`;
+  }
+  flushList(); flushTbl();
+  if(inCode) html+=`<pre>${esc(codeBuf.join("\n"))}</pre>`;
+  return html;
+}
+function titleBlock(t, docId){
+  const doc = DOCS.find(d=>d.id===(docId||state.activeTab));
+  return `<div class="doc-no">${doc?doc.kno:""}　/　${doc?doc.no:""}　CONFIDENTIAL — DRAFT</div><h1>${inline(t)}</h1><p class="doc-sub">${doc?doc.name:""}｜AI PoC 平安風ドキュメント</p>`;
+}
+function inline(s){
+  // 《...》は fill ハイライト、**bold**、`code`
+  s = esc(s);
+  s = s.replace(/《([^》]*)》/g,'<span class="fill">《$1》</span>');
+  s = s.replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>");
+  s = s.replace(/`([^`]+)`/g,"<code>$1</code>");
+  return s;
+}
+
+/* ════════════════════════ レンダリング ════════════════════════ */
+function render(){
+  const body = document.getElementById("docBody");
+  const doc = DOCS.find(d=>d.id===state.activeTab);
+  if(state.activeTab==="docreview"){
+    document.getElementById("docMeta").textContent = `${doc.kno}　${doc.no} ・ ${doc.name}`;
+    body.innerHTML = reviewPanelHtml() + (state.generated? mdToHtml(docMd("docreview"),"docreview") : "");
+    updateReviewBtn(); reviewScore();
+    const sc=document.querySelector(".doc-scroll"); if(sc) sc.scrollTop=0;
+    return;
+  }
+  document.getElementById("docMeta").textContent =
+    state.generated ? `${doc.kno}　${doc.no} ・ ${doc.name}` : "— ドキュメント未生成 —";
+  if(!state.generated){ return; }
+  body.innerHTML = mdToHtml(docMd(state.activeTab)||"", state.activeTab);
+  document.querySelector(".doc-scroll").scrollTop=0;
+}
+
+/* ════════════════════════ 生成トリガ ════════════════════════ */
+async function generate(){
+  const c = ctx();
+  // 1) まずオフラインで全ドキュメントを生成（必ず結果が出る）
+  const out={};
+  try{ DOCS.forEach(d=> out[d.id]=injectWWH(GENERATORS[d.id](c), d.id, c)); }
+  catch(e){ toast("生成中にエラーが発生しました（蛍火ログをご確認ください）", true); logErr("generate: "+(e.message||e)); return; }
+  state.generated=out;
+  render();
+  autosave();
+  toast(DOCS.length+"種のドキュメントを生成しました");
+
+  // 2) APIキーがあれば各章をAIで具体化（任意・失敗してもオフライン結果は残る）
+  const key = apiKeyEl.value.trim();
+  if(key.length>10){ await enhanceWithAI(c, key); }
+}
+
+async function enhanceWithAI(c, key){
+  const btn=document.getElementById("btnGen");
+  const status=document.getElementById("aiStatus");
+  btn.disabled=true; status.classList.add("show");
+  try{
+    for(const d of DOCS){
+      document.getElementById("aiStatusTxt").textContent=`${d.no} ${d.name} を具体化中…`;
+      const enhanced = await callClaude(key, d, c, state.generated[d.id]);
+      if(enhanced){ state.generated[d.id]=enhanced; if(state.activeTab===d.id) render(); }
+    }
+    toast("AIによる具体化が完了しました");
+  }catch(e){
+    toast("AI具体化をスキップ（オフライン結果を表示中）："+(e.message||e), true);
+  }finally{
+    btn.disabled=false; status.classList.remove("show");
+  }
+}
+
+async function callClaude(key, doc, c, draft){
+  const sys = "あなたは製造業向けAI/RAG PoCを多数手がける一流のソリューションアーキテクトです。"
+    + "渡された日本語のMarkdownドラフトを、商用提案レベルに具体化・洗練してください。"
+    + "制約: (1)Markdown構造（見出し・表）は維持 (2)誇張・断定を避け、根拠が曖昧な数値は《》のプレースホルダで残す "
+    + "(3)事実でない固有名詞や実績を捏造しない (4)出力はMarkdown本文のみ、前置き・後置きや```は付けない。";
+  const user = `案件: ${c.project||"未記入"}\nクライアント: ${c.client||"未記入"}\n課題カテゴリ: ${c.cat}\n`
+    + `対象データ: ${c.data.join("・")||"未選択"}\nAI機能: ${c.feats.join("・")||"未選択"}\n`
+    + `課題: ${c.pain||"未記入"}\n期間: ${c.term} / 精度目標: ${c.acc} / 基盤: ${c.llm}\n\n`
+    + `--- 対象ドキュメント: ${doc.name} ---\n以下のドラフトを具体化してください。\n\n${draft}`;
+
+  const res = await fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "x-api-key":key,
+      "anthropic-version":"2023-06-01",
+      "anthropic-dangerous-direct-browser-access":"true"
+    },
+    body:JSON.stringify({
+      model:"claude-sonnet-4-6",
+      max_tokens:2200,
+      system:sys,
+      messages:[{role:"user",content:user}]
+    })
+  });
+  if(!res.ok){ throw new Error("API "+res.status); }
+  const data=await res.json();
+  const text=(data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("\n").trim();
+  return text.replace(/^```[a-z]*\n?/,"").replace(/```$/,"").trim() || null;
+}
+
+/* ════════════════════════ 出力（PRO） ════════════════════════ */
+function noDoc(){ if(!state.generated){ toast("先にドキュメントを生成してください", true); return true; } return false; }
+function currentMd(){ return state.generated ? state.generated[state.activeTab] : ""; }
+/* ===== 一次保存（下書き） ===== */
+const DRAFT_KEY="aipoc_draft_v2";
+let _lsOK=true;
+function lsSet(k,val){ try{ localStorage.setItem(k,val); return true; }catch(e){ _lsOK=false; return false; } }
+function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ _lsOK=false; return null; } }
+function _pad(n){ return String(n).padStart(2,"0"); }
+function _hm(ts){ const d=new Date(ts); return _pad(d.getHours())+":"+_pad(d.getMinutes()); }
+function snapshot(){
+  return { v:2, ts:Date.now(),
+    f:{project:v("f_project"),client:v("f_client"),pain:v("f_pain"),term:v("f_term"),acc:v("f_acc"),llm:v("f_llm")},
+    category:state.category, data:[...state.data], feature:[...state.feature],
+    blank:state.blank, activeTab:state.activeTab, generated:state.generated };
+}
+function applySnapshot(s){
+  if(!s) return false;
+  try{
+    const set=(id,val)=>{ const el=document.getElementById(id); if(el!=null&&val!=null) el.value=val; };
+    if(s.f){ set("f_project",s.f.project); set("f_client",s.f.client); set("f_pain",s.f.pain); set("f_term",s.f.term); set("f_acc",s.f.acc); set("f_llm",s.f.llm); }
+    if(s.category) state.category=s.category;
+    if(Array.isArray(s.data)) state.data=new Set(s.data);
+    if(Array.isArray(s.feature)) state.feature=new Set(s.feature);
+    if(typeof s.blank==="boolean") state.blank=s.blank;
+    if(s.activeTab && DOCS.some(d=>d.id===s.activeTab)) state.activeTab=s.activeTab;
+    if(s.generated) state.generated=s.generated;
+    buildAllChips(); buildTabs();
+    document.querySelectorAll("#modeSeg .seg-b").forEach(b=> b.classList.toggle("on", b.dataset.m===(state.blank?"blank":"filled")));
+    render();
+    return true;
+  }catch(e){ logErr("下書きの復元に失敗: "+(e.message||e)); return false; }
+}
+function saveDraft(manual){
+  const snap=snapshot(); const ok=lsSet(DRAFT_KEY, JSON.stringify(snap));
+  const st=document.getElementById("draftStatus");
+  if(ok){ if(st) st.textContent="下書き: "+_hm(snap.ts)+" 一次保存"; if(manual) toast("下書きを一次保存しました"); }
+  else { if(st) st.textContent="下書き: 自動保存不可 →『書出』をご利用"; if(manual) toast("この環境では自動保存ができません。『書出』でJSON保存できます。", true); }
+}
+let _asTimer; function autosave(){ clearTimeout(_asTimer); _asTimer=setTimeout(()=>saveDraft(false),600); }
+function restoreDraftFromStore(){
+  const json=lsGet(DRAFT_KEY);
+  if(!json){ toast("保存された下書きが見つかりません", true); return; }
+  try{ applySnapshot(JSON.parse(json)); toast("下書きを復元しました"); }
+  catch(e){ toast("下書きの読み取りに失敗しました", true); logErr("draft parse: "+(e.message||e)); }
+}
+function clearDraft(){ try{ localStorage.removeItem(DRAFT_KEY); }catch(e){} const st=document.getElementById("draftStatus"); if(st) st.textContent="下書き: 消去しました"; toast("保存した下書きを消去しました"); }
+function resetAll(){
+  if(typeof confirm==="function" && !confirm("入力・選択・生成結果をすべて消去して初期状態に戻します。保存した下書きも消えます。よろしいですか？")) return;
+  ["f_project","f_client","f_pain","f_term","f_acc","f_llm"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
+  state.category="knowledge"; state.data=new Set(["pdf","manual"]); state.feature=new Set(["rag","extract"]);
+  state.blank=false; state.generated=null; state.activeTab=DOCS[0].id;
+  try{ localStorage.removeItem(DRAFT_KEY); }catch(e){}
+  buildAllChips(); buildTabs();
+  document.querySelectorAll("#modeSeg .seg-b").forEach(b=> b.classList.toggle("on", b.dataset.m==="filled"));
+  render();
+  const st=document.getElementById("draftStatus"); if(st) st.textContent= _lsOK ? "下書き: 初期化しました（自動保存 有効）" : "下書き: 初期化しました";
+  toast("初期状態に戻しました");
+}
+function exportDraftJson(){ try{ dl((projName()||"AI_PoC")+"_下書き.json", JSON.stringify(snapshot(),null,2), "application/json"); toast("下書きをJSONで書き出しました"); }catch(e){ toast("書き出しに失敗しました", true); logErr("draft export: "+(e.message||e)); } }
+function importDraftJson(ev){
+  const f=ev.target&&ev.target.files&&ev.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{ try{ applySnapshot(JSON.parse(r.result)); saveDraft(false); toast("下書きを読み込みました"); }catch(e){ toast("JSONの読み込みに失敗しました", true); logErr("draft import: "+(e.message||e)); } };
+  r.onerror=()=>{ toast("ファイルの読み込みに失敗しました", true); };
+  r.readAsText(f); ev.target.value="";
+}
+function bootDraft(){
+  const json=lsGet(DRAFT_KEY); const st=document.getElementById("draftStatus");
+  if(json){ try{ if(applySnapshot(JSON.parse(json))){ if(st) st.textContent="下書き: 前回分を復元しました"; toast("前回の下書きを復元しました"); return; } }catch(e){ logErr("boot draft: "+(e.message||e)); } }
+  if(st) st.textContent = _lsOK ? "下書き: 未保存（自動保存 有効）" : "下書き: 自動保存不可 →『書出』をご利用";
+}
+
+/* ===== 蛍火（ほたるび）ログ ===== */
+const BUGLOG=[];
+function logErr(msg){ logEvent("ERROR", msg); }
+function logEvent(type, msg){
+  BUGLOG.push({t:Date.now(), type, msg:String(msg)}); if(BUGLOG.length>200) BUGLOG.shift();
+  const btn=document.getElementById("hotaruBtn"), cnt=document.getElementById("hotaruCount"), pnl=document.getElementById("hotaruPanel");
+  if(btn) btn.classList.add("lit");
+  if(cnt){ const n=BUGLOG.filter(x=>x.type==="ERROR").length; cnt.textContent=n; cnt.style.display=n?"flex":"none"; }
+  if(pnl && pnl.classList.contains("open")) renderHotaru();
+}
+window.addEventListener("error", e=>{ logErr((e.message||"エラー")+(e.filename?(" @ "+String(e.filename).split("/").pop()+":"+e.lineno):"")); });
+window.addEventListener("unhandledrejection", e=>{ const r=e.reason; logErr("Promise: "+((r&&r.message)||r)); });
+function _ts(ts){ const d=new Date(ts); return _pad(d.getHours())+":"+_pad(d.getMinutes())+":"+_pad(d.getSeconds()); }
+function openHotaru(on){
+  const p=document.getElementById("hotaruPanel");
+  const willOpen = (on===undefined) ? !p.classList.contains("open") : on;
+  p.classList.toggle("open", willOpen);
+  if(willOpen){ renderHotaru(); const b=document.getElementById("hotaruBtn"); if(b) b.classList.remove("lit"); }
+}
+function renderHotaru(){
+  const list=document.getElementById("hotaruList");
+  if(!BUGLOG.length){ list.innerHTML='<div class="hotaru-empty">蛍はまだ灯っていません（不具合は記録されていません）。</div>'; return; }
+  list.innerHTML=BUGLOG.slice().reverse().map(e=>`<div class="hotaru-row ${e.type==='ERROR'?'err':''}"><span class="hb">●</span><span class="ht">${_ts(e.t)}</span><span class="hm">${esc(e.msg)}</span></div>`).join("");
+}
+function logText(){
+  const head=[
+    "── 蛍火ログ / AI PoC 平安風ドキュメントジェネレーターツールPRO ──",
+    "日時: "+new Date().toString(),
+    "UA : "+navigator.userAgent,
+    "案件: "+(v("f_project")||"-")+"  課題: "+catLabel(),
+    "対象: "+(dataLabels().join("・")||"-")+"  機能: "+(featLabels().join("・")||"-"),
+    "章数: "+(state.generated?Object.keys(state.generated).length:0)+"  モード: "+(state.blank?"白紙ひな型":"記入済み"),
+    "記録件数: "+BUGLOG.length,
+    "──────────────────────────────"
+  ].join("\n");
+  const body=BUGLOG.length? BUGLOG.map(e=>"["+new Date(e.t).toISOString()+"] "+e.type+": "+e.msg).join("\n") : "(記録なし)";
+  return head+"\n"+body+"\n";
+}
+function copyLog(){
+  navigator.clipboard.writeText(logText()).then(
+    ()=>toast("蛍火ログをコピーしました（貼り付けて共有できます）"),
+    ()=>{ dl("蛍火ログ.txt", logText(), "text/plain"); toast("コピー不可のため .txt で保存しました"); });
+}
+function clearLog(){ BUGLOG.length=0; renderHotaru(); const c=document.getElementById("hotaruCount"); if(c) c.style.display="none"; toast("蛍火ログを消去しました"); }
+/* ---- 白紙ひな型 / 出力モード ---- */
+function projDisplay(){ const el=document.getElementById("f_project"); return ((el&&el.value)||"AI PoC").trim()||"AI PoC"; }
+function blankTables(md){
+  const lines=md.split("\n"), out=[];
+  for(let i=0;i<lines.length;i++){
+    const ln=lines[i];
+    if(/^\s*\|.*\|\s*$/.test(ln) && /^\s*\|[\s:|-]+\|\s*$/.test(lines[i+1]||"")){
+      const cols=ln.split("|").slice(1,-1).length;
+      out.push(ln); out.push(lines[i+1]);
+      let j=i+2,n=0; while(j<lines.length && /^\s*\|.*\|\s*$/.test(lines[j])){ n++; j++; }
+      const rows=Math.max(n,4), cell="《　》";
+      for(let k=0;k<rows;k++) out.push("| "+Array(cols).fill(cell).join(" | ")+" |");
+      i=j-1;
+    } else out.push(ln);
+  }
+  return out.join("\n");
+}
+function blankifyMd(md){
+  const lines=md.split("\n"), out=[]; let inCode=false; const B="《　　　　　　　　　》";
+  for(let ln of lines){
+    if(/^\s*```/.test(ln)){ inCode=!inCode; out.push(ln); continue; }
+    if(inCode){ out.push(ln); continue; }
+    if(/^#{1,3}\s/.test(ln)){ out.push(ln); continue; }
+    if(/^>\s?/.test(ln)){ out.push(ln); continue; }
+    if(/^\*\*.+\*\*$/.test(ln.trim())){ out.push(ln); continue; }
+    if(/^\s*\|.*\|\s*$/.test(ln)){ out.push(ln); continue; }
+    if(/^---\s*$/.test(ln)){ out.push(ln); continue; }
+    if(ln.trim()===""){ out.push(ln); continue; }
+    if(/^[-*]\s/.test(ln)){ out.push("- "+B); continue; }
+    let m=ln.match(/^(\d+\.)\s/); if(m){ out.push(m[1]+" "+B); continue; }
+    out.push(B);
+  }
+  return blankTables(out.join("\n"));
+}
+function docMd(id){ const md=state.generated?state.generated[id]:""; return state.blank? blankifyMd(md): md; }
+function setMode(m){
+  state.blank=(m==="blank");
+  document.querySelectorAll("#modeSeg .seg-b").forEach(b=> b.classList.toggle("on", b.dataset.m===m));
+  if(state.generated) render();
+  autosave();
+  toast(state.blank? "白紙ひな型モード：記入用の空欄で書き出します" : "記入済みモード（叩き台）");
+}
+function projName(){ return (v("f_project")||"AI_PoC").replace(/[^\w一-龥ぁ-んァ-ヶー]+/g,"_").replace(/^_+|_+$/g,"") || "AI_PoC"; }
+function docFile(d){ return `${d.no}_${d.name}`; }
+function today(){ const d=new Date(),p=n=>String(n).padStart(2,"0"); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`; }
+
+function copyMd(){
+  if(noDoc()) return; closeMenus();
+  navigator.clipboard.writeText(currentMd()).then(
+    ()=>toast("Markdownをコピーしました"),
+    ()=>toast("コピーできませんでした（ローカルで開くと確実です）", true));
+}
+
+/* ---- 変換 ---- */
+function cleanInline(s){ return String(s==null?"":s).replace(/\*\*(.*?)\*\*/g,"$1").replace(/`(.*?)`/g,"$1"); }
+
+function mdToText(md){
+  const lines=md.split("\n"), out=[]; let inCode=false; let m;
+  for(let ln of lines){
+    if(/^\s*```/.test(ln)){ inCode=!inCode; out.push("--------------------"); continue; }
+    if(inCode){ out.push("    "+ln); continue; }
+    if(m=ln.match(/^#\s+(.*)/)){ out.push(""); out.push("■ "+cleanInline(m[1])); out.push("===================="); continue; }
+    if(m=ln.match(/^##\s+(.*)/)){ out.push(""); out.push("【"+cleanInline(m[1])+"】"); continue; }
+    if(m=ln.match(/^###\s+(.*)/)){ out.push(""); out.push("◆ "+cleanInline(m[1])); continue; }
+    if(/^>\s?/.test(ln)){ out.push("  » "+cleanInline(ln.replace(/^>\s?/,""))); continue; }
+    if(/^[-*]\s/.test(ln)){ out.push("  ・"+cleanInline(ln.replace(/^[-*]\s/,""))); continue; }
+    if(/^\d+\.\s/.test(ln)){ out.push("  "+cleanInline(ln)); continue; }
+    if(/^\s*\|.*\|\s*$/.test(ln)){
+      if(/^\s*\|[\s:|-]+\|\s*$/.test(ln)) continue;
+      out.push("  "+ln.split("|").slice(1,-1).map(x=>cleanInline(x.trim())).join("｜")); continue;
+    }
+    if(/^---\s*$/.test(ln)){ out.push("--------------------"); continue; }
+    out.push(cleanInline(ln));
+  }
+  return out.join("\n").replace(/\n{3,}/g,"\n\n").trim()+"\n";
+}
+
+function tablesFromMd(md){
+  const lines=md.split("\n"), out=[]; let section="";
+  const cells=r=>r.split("|").slice(1,-1).map(x=>cleanInline(x.trim()));
+  for(let i=0;i<lines.length;i++){
+    const ln=lines[i], h=ln.match(/^#{1,3}\s+(.*)/);
+    if(h){ section=cleanInline(h[1]).replace(/《|》/g,"").trim(); continue; }
+    if(/^\s*\|.*\|\s*$/.test(ln) && /^\s*\|[\s:|-]+\|\s*$/.test(lines[i+1]||"")){
+      const headers=cells(ln), rows=[]; let j=i+2;
+      while(j<lines.length && /^\s*\|.*\|\s*$/.test(lines[j])){ rows.push(cells(lines[j])); j++; }
+      out.push({title:section||"表", headers, rows}); i=j-1;
+    }
+  }
+  return out;
+}
+
+function csvCell(s){ s=String(s==null?"":s); return /[",\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s; }
+function tablesToCsv(tables){
+  if(!tables.length) return "\uFEFF（この章には表がありません）\n";
+  let out="\uFEFF";
+  tables.forEach((t,idx)=>{
+    if(idx) out+="\n";
+    out+="# "+t.title+"\n";
+    out+=t.headers.map(csvCell).join(",")+"\n";
+    t.rows.forEach(r=> out+=r.map(csvCell).join(",")+"\n");
+  });
+  return out;
+}
+
+/* ---- CRC32 / ZIP(store) ---- */
+function crc32(bytes){
+  let t=crc32._t;
+  if(!t){ t=crc32._t=[]; for(let n=0;n<256;n++){ let c=n; for(let k=0;k<8;k++) c=c&1?(0xEDB88320^(c>>>1)):(c>>>1); t[n]=c>>>0; } }
+  let crc=0xFFFFFFFF;
+  for(let i=0;i<bytes.length;i++) crc=(crc>>>8)^t[(crc^bytes[i])&0xFF];
+  return (crc^0xFFFFFFFF)>>>0;
+}
+function zipStore(files){
+  const enc=new TextEncoder();
+  const u16=n=>[n&255,(n>>8)&255], u32=n=>[n&255,(n>>8)&255,(n>>16)&255,(n>>24)&255];
+  const parts=[], central=[]; let offset=0;
+  for(const f of files){
+    const name=enc.encode(f.name);
+    const data=(f.data instanceof Uint8Array)? f.data : enc.encode(f.data);
+    const crc=crc32(data);
+    const lh=new Uint8Array([].concat(u32(0x04034b50),u16(20),u16(0x0800),u16(0),u16(0),u16(0),u32(crc),u32(data.length),u32(data.length),u16(name.length),u16(0)));
+    parts.push(lh,name,data);
+    const ch=new Uint8Array([].concat(u32(0x02014b50),u16(20),u16(20),u16(0x0800),u16(0),u16(0),u16(0),u32(crc),u32(data.length),u32(data.length),u16(name.length),u16(0),u16(0),u16(0),u16(0),u32(0),u32(offset)));
+    central.push(ch,name);
+    offset+=lh.length+name.length+data.length;
+  }
+  const cenSize=central.reduce((s,a)=>s+a.length,0);
+  const eocd=new Uint8Array([].concat(u32(0x06054b50),u16(0),u16(0),u16(files.length),u16(files.length),u32(cenSize),u32(offset),u16(0)));
+  const all=[...parts,...central,eocd];
+  const total=all.reduce((s,a)=>s+a.length,0);
+  const out=new Uint8Array(total); let p=0; for(const a of all){ out.set(a,p); p+=a.length; }
+  return out;
+}
+
+/* ---- XLSX(自前・無依存) ---- */
+function colLetter(n){ let s=""; while(n>0){ const m=(n-1)%26; s=String.fromCharCode(65+m)+s; n=(n-m-1)/26; } return s; }
+function xmlEsc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function sheetName(s, used){
+  let n=String(s||"Sheet").replace(/[\[\]\:\*\?\/\\]/g,"").slice(0,28).trim()||"Sheet";
+  let base=n,k=2; while(used.has(n)){ n=base.slice(0,28-((""+k).length+1))+"_"+k; k++; } used.add(n); return n;
+}
+function xlBody(sh){
+  const head=`<row r="1">`+sh.headers.map((h,ci)=>`<c r="${colLetter(ci+1)}1" t="inlineStr" s="1"><is><t xml:space="preserve">${xmlEsc(h)}</t></is></c>`).join("")+`</row>`;
+  const body=sh.rows.map((row,ri)=>{
+    const r=ri+2;
+    const cs=row.map((val,ci)=>{
+      const ref=colLetter(ci+1)+r;
+      if(val && typeof val==="object"){
+        const st=val.s!==undefined?` s="${val.s}"`:"";
+        if(val.f!==undefined) return `<c r="${ref}"${st}><f>${xmlEsc(String(val.f).replace(/^=/,""))}</f>${val.v!==undefined?`<v>${xmlEsc(String(val.v))}</v>`:""}</c>`;
+        if(val.n!==undefined) return `<c r="${ref}"${st}><v>${val.n}</v></c>`;
+        return `<c r="${ref}" t="inlineStr"${st}><is><t xml:space="preserve">${xmlEsc(val.text||"")}</t></is></c>`;
+      }
+      return `<c r="${ref}" t="inlineStr"><is><t xml:space="preserve">${xmlEsc(val==null?"":val)}</t></is></c>`;
+    }).join("");
+    return `<row r="${r}">${cs}</row>`;
+  }).join("");
+  return head+body;
+}
+function sheetXml(sh){
+  const cols= sh.cols&&sh.cols.length ? `<cols>${sh.cols.map((w,i)=>`<col min="${i+1}" max="${i+1}" width="${w}" customWidth="1"/>`).join("")}</cols>` : "";
+  const cf= sh.cf&&sh.cf.length ? sh.cf.map((c,i)=>`<conditionalFormatting sqref="${c.sqref}"><cfRule type="expression" dxfId="${c.dxf}" priority="${i+1}"><formula>${xmlEsc(c.formula)}</formula></cfRule></conditionalFormatting>`).join("") : "";
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">${cols}<sheetData>${xlBody(sh)}</sheetData>${cf}</worksheet>`;
+}
+function buildXlsx(sheets){
+  if(!sheets.length) sheets=[{name:"表なし",headers:["（表がありません）"],rows:[]}];
+  const used=new Set(); sheets.forEach(s=> s._name=sheetName(s.name,used));
+  const f=[];
+  f.push({name:"[Content_Types].xml", data:
+    `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>`+
+    sheets.map((s,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join("")+`</Types>`});
+  f.push({name:"_rels/.rels", data:
+    `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`});
+  f.push({name:"xl/workbook.xml", data:
+    `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>`+
+    sheets.map((s,i)=>`<sheet name="${xmlEsc(s._name)}" sheetId="${i+1}" r:id="rId${i+1}"/>`).join("")+`</sheets></workbook>`});
+  const stylesRid="rId"+(sheets.length+1);
+  f.push({name:"xl/_rels/workbook.xml.rels", data:
+    `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">`+
+    sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join("")+
+    `<Relationship Id="${stylesRid}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`});
+  f.push({name:"xl/styles.xml", data:
+    `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="4"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFF7E6EC"/><bgColor indexed="64"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFFDEBD0"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles><dxfs count="2"><dxf><fill><patternFill><bgColor rgb="FFF7E6EC"/></patternFill></fill></dxf><dxf><fill><patternFill><bgColor rgb="FFFDEBD0"/></patternFill></fill></dxf></dxfs></styleSheet>`});
+  sheets.forEach((s,i)=> f.push({name:`xl/worksheets/sheet${i+1}.xml`, data:sheetXml(s)}));
+  return zipStore(f);
+}
+
+/* ---- Word(.docx)（自前・無依存 OOXML） ---- */
+const DOCX_STYLES = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:eastAsia="Yu Gothic"/><w:sz w:val="21"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="120" w:line="288" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style><w:style w:type="paragraph" w:styleId="Title"><w:name w:val="Title"/><w:basedOn w:val="Normal"/><w:pPr><w:spacing w:before="0" w:after="160"/><w:outlineLvl w:val="0"/><w:pBdr><w:bottom w:val="single" w:sz="12" w:space="4" w:color="2B2233"/></w:pBdr></w:pPr><w:rPr><w:rFonts w:eastAsia="Yu Mincho"/><w:b/><w:color w:val="2B2233"/><w:sz w:val="40"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="Heading1"><w:name w:val="heading 1"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:pPr><w:keepNext/><w:spacing w:before="240" w:after="80"/><w:outlineLvl w:val="1"/></w:pPr><w:rPr><w:rFonts w:eastAsia="Yu Mincho"/><w:b/><w:color w:val="8E3F4C"/><w:sz w:val="28"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="Heading2"><w:name w:val="heading 2"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:pPr><w:keepNext/><w:spacing w:before="160" w:after="60"/><w:outlineLvl w:val="2"/></w:pPr><w:rPr><w:rFonts w:eastAsia="Yu Mincho"/><w:b/><w:color w:val="6E5E94"/><w:sz w:val="24"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="ListParagraph"><w:name w:val="List Paragraph"/><w:basedOn w:val="Normal"/><w:pPr><w:ind w:left="420"/><w:spacing w:after="40"/></w:pPr></w:style><w:style w:type="table" w:default="1" w:styleId="TableGrid"><w:name w:val="Table Grid"/><w:tblPr><w:tblBorders><w:top w:val="single" w:sz="4" w:color="C9B98C"/><w:left w:val="single" w:sz="4" w:color="C9B98C"/><w:bottom w:val="single" w:sz="4" w:color="C9B98C"/><w:right w:val="single" w:sz="4" w:color="C9B98C"/><w:insideH w:val="single" w:sz="4" w:color="C9B98C"/><w:insideV w:val="single" w:sz="4" w:color="C9B98C"/></w:tblBorders></w:tblPr></w:style></w:styles>`;
+const DOCX_NUMBERING = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:numbering xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:abstractNum w:abstractNumId="0"><w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="bullet"/><w:lvlText w:val="•"/><w:lvlJc w:val="left"/><w:pPr><w:ind w:left="420" w:hanging="240"/></w:pPr></w:lvl></w:abstractNum><w:abstractNum w:abstractNumId="1"><w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:lvlText w:val="%1."/><w:lvlJc w:val="left"/><w:pPr><w:ind w:left="420" w:hanging="240"/></w:pPr></w:lvl></w:abstractNum><w:num w:numId="1"><w:abstractNumId w:val="0"/></w:num><w:num w:numId="2"><w:abstractNumId w:val="1"/></w:num></w:numbering>`;
+
+function docxRuns(s){
+  const re=/(\*\*[^*]+\*\*|`[^`]+`|《[^》]*》)/g;
+  const tokens=[]; let last=0, m;
+  while((m=re.exec(s))){
+    if(m.index>last) tokens.push({t:s.slice(last,m.index)});
+    const tok=m[0];
+    if(tok.startsWith("**")) tokens.push({t:tok.slice(2,-2),bold:true});
+    else if(tok.startsWith("`")) tokens.push({t:tok.slice(1,-1),code:true});
+    else tokens.push({t:tok,fill:true});
+    last=re.lastIndex;
+  }
+  if(last<s.length) tokens.push({t:s.slice(last)});
+  if(!tokens.length) tokens.push({t:""});
+  return tokens.map(tk=>{
+    const rp=[];
+    if(tk.bold) rp.push("<w:b/>");
+    if(tk.fill){ rp.push("<w:b/>"); rp.push('<w:color w:val="B23A48"/>'); }
+    if(tk.code){ rp.push('<w:rFonts w:ascii="Consolas" w:hAnsi="Consolas"/>'); rp.push('<w:color w:val="8E3F4C"/>'); }
+    const r = rp.length? `<w:rPr>${rp.join("")}</w:rPr>`:"";
+    return `<w:r>${r}<w:t xml:space="preserve">${xmlEsc(tk.t)}</w:t></w:r>`;
+  }).join("");
+}
+function docxPara(runsXml, style){ const pPr= style?`<w:pPr><w:pStyle w:val="${style}"/></w:pPr>`:""; return `<w:p>${pPr}${runsXml}</w:p>`; }
+function docxListItem(runsXml, numId){ return `<w:p><w:pPr><w:pStyle w:val="ListParagraph"/><w:numPr><w:ilvl w:val="0"/><w:numId w:val="${numId}"/></w:numPr></w:pPr>${runsXml}</w:p>`; }
+function docxQuote(runsXml){ return `<w:p><w:pPr><w:pBdr><w:left w:val="single" w:sz="18" w:space="6" w:color="8E3F4C"/></w:pBdr><w:shd w:val="clear" w:color="auto" w:fill="EFE0E0"/><w:ind w:left="140"/></w:pPr>${runsXml}</w:p>`; }
+function docxCode(lines){
+  const body=lines.map(ln=>`<w:r><w:rPr><w:rFonts w:ascii="Consolas" w:hAnsi="Consolas"/><w:sz w:val="18"/></w:rPr><w:t xml:space="preserve">${xmlEsc(ln)}</w:t></w:r>`).join("<w:r><w:br/></w:r>");
+  return `<w:p><w:pPr><w:shd w:val="clear" w:color="auto" w:fill="F1ECE0"/><w:spacing w:before="60" w:after="60"/></w:pPr>${body}</w:p>`;
+}
+function docxTable(headers, rows){
+  const n=headers.length||1;
+  const grid="<w:tblGrid>"+headers.map(()=>`<w:gridCol w:w="${Math.floor(9200/n)}"/>`).join("")+"</w:tblGrid>";
+  const head="<w:tr>"+headers.map(h=>`<w:tc><w:tcPr><w:shd w:val="clear" w:color="auto" w:fill="2B2233"/></w:tcPr><w:p><w:pPr><w:spacing w:after="0"/></w:pPr><w:r><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr><w:t xml:space="preserve">${xmlEsc(h)}</w:t></w:r></w:p></w:tc>`).join("")+"</w:tr>";
+  const body=rows.map((r,ri)=>{
+    const cells=r.slice(0,n); while(cells.length<n) cells.push("");
+    const shd= ri%2? '<w:tcPr><w:shd w:val="clear" w:color="auto" w:fill="FBF8F0"/></w:tcPr>':"";
+    return "<w:tr>"+cells.map(c=>`<w:tc>${shd}<w:p><w:pPr><w:spacing w:after="0"/></w:pPr>${docxRuns(c)}</w:p></w:tc>`).join("")+"</w:tr>";
+  }).join("");
+  return `<w:tbl><w:tblPr><w:tblStyle w:val="TableGrid"/><w:tblW w:w="0" w:type="auto"/></w:tblPr>${grid}${head}${body}</w:tbl><w:p/>`;
+}
+function mdToDocxBody(md){
+  const lines=md.split("\n"), xml=[]; let inCode=false, codeBuf=[], tbl=null, m;
+  const flushTbl=()=>{ if(tbl){ xml.push(docxTable(tbl.headers, tbl.rows)); tbl=null; } };
+  for(let i=0;i<lines.length;i++){
+    let ln=lines[i];
+    if(/^\s*```/.test(ln)){ if(inCode){ xml.push(docxCode(codeBuf)); codeBuf=[]; inCode=false; } else { flushTbl(); inCode=true; } continue; }
+    if(inCode){ codeBuf.push(ln); continue; }
+    if(/^\s*\|.*\|\s*$/.test(ln)){
+      if(/^\s*\|[\s:|-]+\|\s*$/.test(ln)) continue;
+      const cells=ln.split("|").slice(1,-1).map(x=>x.trim());
+      if(!tbl) tbl={headers:cells, rows:[]}; else tbl.rows.push(cells);
+      continue;
+    } else flushTbl();
+    if(m=ln.match(/^#\s+(.*)/)){ xml.push(docxPara(docxRuns(m[1]),"Title")); continue; }
+    if(m=ln.match(/^##\s+(.*)/)){ xml.push(docxPara(docxRuns(m[1]),"Heading1")); continue; }
+    if(m=ln.match(/^###\s+(.*)/)){ xml.push(docxPara(docxRuns(m[1]),"Heading2")); continue; }
+    if(/^>\s?/.test(ln)){ xml.push(docxQuote(docxRuns(ln.replace(/^>\s?/,"")))); continue; }
+    if(/^[-*]\s/.test(ln)){ xml.push(docxListItem(docxRuns(ln.replace(/^[-*]\s/,"")),1)); continue; }
+    if(/^\d+\.\s/.test(ln)){ xml.push(docxListItem(docxRuns(ln.replace(/^\d+\.\s/,"")),2)); continue; }
+    if(/^---\s*$/.test(ln)){ xml.push('<w:p><w:pPr><w:pBdr><w:bottom w:val="single" w:sz="6" w:space="1" w:color="C9B98C"/></w:pBdr></w:pPr></w:p>'); continue; }
+    if(ln.trim()===""){ continue; }
+    xml.push(docxPara(docxRuns(ln)));
+  }
+  if(inCode) xml.push(docxCode(codeBuf));
+  flushTbl();
+  return xml.join("");
+}
+const DOCX_SETTINGS = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:settings xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:updateFields w:val="true"/></w:settings>`;
+const KASANE12=["E8C6CF","D99FB0","C9758B","B85A6B","A84656","8E3F4C","8A5A6A","7E6A8E","6E5E94","8576AD","9583B8","B3A6D0"];
+function docxKasaneBar(h){
+  h=h||120; const line=Math.max(40,h-20);
+  const grid="<w:tblGrid>"+KASANE12.map(()=>'<w:gridCol w:w="788"/>').join("")+"</w:tblGrid>";
+  const cells=KASANE12.map(c=>`<w:tc><w:tcPr><w:tcW w:w="788" w:type="dxa"/><w:tcBorders><w:top w:val="nil"/><w:left w:val="nil"/><w:bottom w:val="nil"/><w:right w:val="nil"/></w:tcBorders><w:shd w:val="clear" w:color="auto" w:fill="${c}"/><w:tcMar><w:top w:w="0" w:type="dxa"/><w:left w:w="0" w:type="dxa"/><w:bottom w:w="0" w:type="dxa"/><w:right w:w="0" w:type="dxa"/></w:tcMar></w:tcPr><w:p><w:pPr><w:spacing w:after="0" w:line="${line}" w:lineRule="exact"/></w:pPr></w:p></w:tc>`).join("");
+  return `<w:tbl><w:tblPr><w:tblW w:w="9456" w:type="dxa"/><w:jc w:val="center"/><w:tblLayout w:type="fixed"/><w:tblBorders><w:top w:val="nil"/><w:left w:val="nil"/><w:bottom w:val="nil"/><w:right w:val="nil"/><w:insideH w:val="nil"/><w:insideV w:val="nil"/></w:tblBorders><w:tblCellMar><w:left w:w="0" w:type="dxa"/><w:right w:w="0" w:type="dxa"/></w:tblCellMar></w:tblPr>${grid}<w:tr><w:trPr><w:trHeight w:val="${h}" w:hRule="exact"/></w:trPr>${cells}</w:tr></w:tbl>`;
+}
+function docxCover(title, docName){
+  const sp='<w:p><w:pPr><w:spacing w:after="0"/></w:pPr></w:p>';
+  return sp.repeat(5)
+    + docxKasaneBar(150)
+    + `<w:p><w:pPr><w:jc w:val="center"/><w:spacing w:before="360" w:after="80"/></w:pPr><w:r><w:rPr><w:rFonts w:eastAsia="Yu Mincho"/><w:b/><w:color w:val="8E3F4C"/><w:sz w:val="50"/></w:rPr><w:t xml:space="preserve">${xmlEsc(title)}</w:t></w:r></w:p>`
+    + `<w:p><w:pPr><w:jc w:val="center"/><w:spacing w:after="320"/></w:pPr><w:r><w:rPr><w:rFonts w:eastAsia="Yu Mincho"/><w:color w:val="2B2233"/><w:sz w:val="30"/></w:rPr><w:t xml:space="preserve">${xmlEsc(docName)}</w:t></w:r></w:p>`
+    + docxKasaneBar(150)
+    + sp.repeat(3)
+    + `<w:p><w:pPr><w:jc w:val="center"/><w:spacing w:after="40"/></w:pPr><w:r><w:rPr><w:color w:val="6E5E94"/><w:sz w:val="22"/></w:rPr><w:t xml:space="preserve">作成日　${today()}</w:t></w:r></w:p>`
+    + `<w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:color w:val="6E5E94"/><w:sz w:val="22"/></w:rPr><w:t xml:space="preserve">作成　《お名前》</w:t></w:r></w:p>`
+    + `<w:p><w:r><w:br w:type="page"/></w:r></w:p>`;
+}
+function docxTocBlock(){
+  return `<w:p><w:pPr><w:spacing w:after="120"/></w:pPr><w:r><w:rPr><w:rFonts w:eastAsia="Yu Mincho"/><w:b/><w:color w:val="2B2233"/><w:sz w:val="30"/></w:rPr><w:t>目　次</w:t></w:r></w:p>`
+    + `<w:p><w:r><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:instrText xml:space="preserve"> TOC \\o "1-3" \\h \\z \\u </w:instrText></w:r><w:r><w:fldChar w:fldCharType="separate"/></w:r><w:r><w:rPr><w:color w:val="6E5E94"/></w:rPr><w:t xml:space="preserve">右クリック →「フィールド更新」または F9 キーで目次を生成してください。</w:t></w:r><w:r><w:fldChar w:fldCharType="end"/></w:r></w:p>`
+    + `<w:p><w:r><w:br w:type="page"/></w:r></w:p>`;
+}
+function docxHeaderXml(project){
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:hdr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">${docxKasaneBar(90)}<w:p><w:pPr><w:jc w:val="right"/><w:spacing w:before="40" w:after="0"/></w:pPr><w:r><w:rPr><w:rFonts w:eastAsia="Yu Mincho"/><w:color w:val="8E3F4C"/><w:sz w:val="16"/></w:rPr><w:t xml:space="preserve">${xmlEsc(project||"AI PoC")}</w:t></w:r></w:p></w:hdr>`;
+}
+function docxFooterXml(project){
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:ftr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><w:p><w:pPr><w:jc w:val="center"/><w:spacing w:before="0" w:after="40"/></w:pPr><w:r><w:rPr><w:color w:val="6E5E94"/><w:sz w:val="16"/></w:rPr><w:t xml:space="preserve">${xmlEsc(project||"AI PoC")}　—　</w:t></w:r><w:r><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:instrText xml:space="preserve"> PAGE </w:instrText></w:r><w:r><w:fldChar w:fldCharType="end"/></w:r><w:r><w:rPr><w:color w:val="6E5E94"/><w:sz w:val="16"/></w:rPr><w:t xml:space="preserve"> / </w:t></w:r><w:r><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:instrText xml:space="preserve"> NUMPAGES </w:instrText></w:r><w:r><w:fldChar w:fldCharType="end"/></w:r><w:r><w:rPr><w:color w:val="6E5E94"/><w:sz w:val="16"/></w:rPr><w:t xml:space="preserve"> 頁</w:t></w:r></w:p>${docxKasaneBar(90)}<w:p/></w:ftr>`;
+}
+const DOCX_HEADER_EMPTY=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:hdr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:p/></w:hdr>`;
+const DOCX_FOOTER_EMPTY=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:ftr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:p/></w:ftr>`;
+function docxPackage(bodyXml, opts){
+  opts=opts||{};
+  const project=opts.project||"";
+  const cover = (opts.coverTitle!==undefined) ? docxCover(opts.coverTitle, opts.docName||"") : "";
+  const toc = (opts.toc!==false) ? docxTocBlock() : "";
+  const ns='xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"';
+  const sect='<w:sectPr><w:headerReference w:type="default" r:id="rId4"/><w:headerReference w:type="first" r:id="rId5"/><w:footerReference w:type="default" r:id="rId6"/><w:footerReference w:type="first" r:id="rId7"/><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1418" w:right="1134" w:bottom="1418" w:left="1134" w:header="567" w:footer="567" w:gutter="0"/><w:titlePg/></w:sectPr>';
+  const documentXml=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<w:document ${ns}><w:body>${cover}${toc}${bodyXml}${sect}</w:body></w:document>`;
+  const ct=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/word/numbering.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml"/><Override PartName="/word/settings.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml"/><Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/><Override PartName="/word/header2.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/><Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/><Override PartName="/word/footer2.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/></Types>`;
+  const rels=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>`;
+  const drels=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering" Target="numbering.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header" Target="header1.xml"/><Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header" Target="header2.xml"/><Relationship Id="rId6" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/><Relationship Id="rId7" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer2.xml"/></Relationships>`;
+  const files=[
+    {name:"[Content_Types].xml", data:ct},
+    {name:"_rels/.rels", data:rels},
+    {name:"word/_rels/document.xml.rels", data:drels},
+    {name:"word/styles.xml", data:DOCX_STYLES},
+    {name:"word/numbering.xml", data:DOCX_NUMBERING},
+    {name:"word/settings.xml", data:DOCX_SETTINGS},
+    {name:"word/header1.xml", data:docxHeaderXml(project)},
+    {name:"word/header2.xml", data:DOCX_HEADER_EMPTY},
+    {name:"word/footer1.xml", data:docxFooterXml(project)},
+    {name:"word/footer2.xml", data:DOCX_FOOTER_EMPTY},
+    {name:"word/document.xml", data:documentXml},
+  ];
+  return zipStore(files);
+}
+function buildDocx(md, opts){ opts=opts||{}; return docxPackage(mdToDocxBody(md), {project:opts.project, coverTitle:(opts.coverTitle!==undefined?opts.coverTitle:(opts.project||"AI PoC")), docName:opts.docName||"", toc:opts.toc!==false}); }
+function buildDocxMulti(mds, opts){ opts=opts||{}; const pb='<w:p><w:r><w:br w:type="page"/></w:r></w:p>'; return docxPackage(mds.map(mdToDocxBody).join(pb), {project:opts.project, coverTitle:(opts.coverTitle!==undefined?opts.coverTitle:(opts.project||"AI PoC")), docName:opts.docName||"ドキュメント一式", toc:opts.toc!==false}); }
+
+
+/* ---- ダウンロード（DOM挿入方式） ---- */
+function dl(name, content, mime){
+  const blob=(content instanceof Uint8Array) ? new Blob([content],{type:mime}) : new Blob([content],{type:mime+";charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url; a.download=name; a.rel="noopener";
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ a.remove(); URL.revokeObjectURL(url); }, 1500);
+}
+
+/* ---- 各章 ---- */
+/* ===== WBS（予定/実績/進捗・自動計算つき）Excel ===== */
+function wbsTasks(c){
+  const ocr=state.feature.has("ocr")||state.data.has("draw")||state.data.has("form");
+  const rag=state.feature.has("rag")||state.category==="knowledge";
+  const T=[]; const push=(no,task)=>T.push({no,task});
+  push("1","立ち上げ");
+  push("1.1","キックオフ・ゴール合意");
+  push("1.2","データ受領・取り扱い確認");
+  push("1.3","評価セット設計（"+(c.acc||"精度目標")+"）");
+  push("2","設計・準備");
+  push("2.1","アーキテクチャ確定");
+  push("2.2","環境・権限の準備");
+  push("3","実装");
+  push("3.1","取り込み・前処理");
+  if(ocr) push("3.2","OCR・構造化");
+  if(rag){ push("3.3","Embedding・索引化"); push("3.4","検索（複合）"); }
+  push("3.5","LLM連携（"+(c.feats.join("・")||"生成")+"）");
+  push("4","評価・改善");
+  push("4.1","精度評価");
+  push("4.2","改善の反復");
+  push("4.3","性能・安全性確認");
+  push("5","取りまとめ");
+  push("5.1","報告書・デモ準備");
+  push("5.2","報告・Go / No-Go");
+  return T;
+}
+function buildWbsSheets(c){
+  const tasks=wbsTasks(c);
+  const headers=["No","作業","担当","予定開始","予定完了","予定工数","実績開始","実績完了","実績工数","進捗%","遅れ(日)","状態","遅延理由"];
+  const rows=tasks.map((t,i)=>{
+    const r=i+2;
+    return [ t.no, t.task, "", "", "", "", "", "", "",
+      {n:0},
+      {f:`IF(ISNUMBER(H${r}),IF(ISNUMBER(E${r}),H${r}-E${r},""),IF(AND(ISNUMBER(E${r}),TODAY()>E${r}),TODAY()-E${r},0))`, v:0},
+      {f:`IF(J${r}=100,"完了",IF(J${r}>0,"進行中","未着手"))`, v:"未着手"},
+      "" ];
+  });
+  const last=tasks.length+1;
+  rows.push(["","合計 / 平均","","","",{f:`SUM(F2:F${last})`,v:0},"","",{f:`SUM(I2:I${last})`,v:0},{f:`ROUND(AVERAGE(J2:J${last}),0)`,v:0},{f:`SUM(K2:K${last})`,v:0},"",""]);
+  const wbs={ name:"WBS", headers, rows,
+    cols:[6,26,8,12,12,8,12,12,8,7,8,9,28],
+    cf:[ {sqref:`A2:M${last}`, formula:`$K2>0`, dxf:1}, {sqref:`A2:M${last}`, formula:`$C2="自分"`, dxf:0} ] };
+  const dheaders=["日付","対象No","作業","遅延の理由","対応・打ち手","担当"];
+  const drows=[]; for(let k=0;k<14;k++) drows.push(["","","","","",""]);
+  const delay={ name:"遅延理由ログ（毎日）", headers:dheaders, rows:drows, cols:[12,8,22,32,32,10],
+    cf:[ {sqref:"A2:F15", formula:`$F2="自分"`, dxf:0} ] };
+  return [wbs, delay];
+}
+
+/* ===== AI設計書レビュー（採点フィードバック＋カイゼン＋参考記事／AI実行：アーティファクトは☑だけ・単体はキー） ===== */
+const REF_POOL={
+  koyobun:"文化庁「公用文作成の考え方」（建議, 2022）",
+  kisha:"共同通信社「記者ハンドブック」",
+  textlint:"textlint（OSS・文章校正）",
+  google:"Google developer documentation style guide",
+  ms:"Microsoft Writing Style Guide",
+  jtca:"テクニカルコミュニケーター協会(JTCA) ガイド",
+  iso26514:"ISO/IEC 26514（システム・ソフトウェア文書）",
+  iso82079:"IEC/IEEE 82079-1:2019（利用情報の作成）",
+  iso42001:"ISO/IEC 42001:2023（AIマネジメント）",
+  rag:"Lewis et al. (2020) RAG. arXiv:2005.11401",
+  cot:"Wei et al. (2022) Chain-of-Thought. arXiv:2201.11903",
+  code:"Chen et al. (2021) Evaluating LLMs Trained on Code. arXiv:2107.03374",
+  prod:"Peng et al. (2023) AI×開発生産性（GitHub Copilotで約55.8%短縮）. arXiv:2302.06590",
+  qiita:"Qiita / Zenn タグ検索（例: テクニカルライティング / 設計書 / RAG）※一次情報で確認",
+  fagan:"Fagan (1976) 設計・コードインスペクション. IBM Systems Journal 15(3):182–211",
+  pbr:"Basili et al. (1996) Perspective-Based Reading. Empirical Software Engineering 1(2):133–164",
+  selfrefine:"Madaan et al. (2023) Self-Refine: Iterative Refinement with Self-Feedback. arXiv:2303.17651",
+  llmjudge:"Zheng et al. (2023) Judging LLM-as-a-Judge（MT-Bench）. arXiv:2306.05685",
+  geval:"Liu et al. (2023) G-Eval: NLG Evaluation using GPT-4. arXiv:2303.16634",
+  thelin:"Thelin, Runeson, Wohlin (2003) Usage-Based vs Checklist-Based Reading. IEEE TSE 29(8):687–704",
+  porter:"Porter, Votta, Basili (1995) Comparing Detection Methods for Requirements Inspections. IEEE TSE 21(6):563–575",
+  jpinsp:"国内: J-STAGE / CiNii / 情報処理学会(IPSJ)・電子情報通信学会(IEICE) で「インスペクション／レビュー」を検索し書誌を確認《要確認・捏造しない》"
+};
+const REVIEW_MODES=[
+  {id:"gentle",   label:"①優しい・学び",        persona:"初学者にやさしく。励ましながら、なぜ良い／直すべきかを噛み砕いて学べるように説く。",
+   checks:["全体の流れが理解できるか","専門用語に説明があるか","図や具体例があるか","まず良い点を見つけたか","次の一歩を示せるか"], refs:["koyobun","jtca","qiita"]},
+  {id:"strict",   label:"②実務・厳しいが真剣",  persona:"妥協せず、抜け漏れ・リスク・曖昧さを率直に指摘する。批判は人格でなく成果物に向ける。",
+   checks:["要件と設計が対応しているか","抜け漏れ・矛盾がないか","異常系・例外を考慮しているか","数値・根拠が曖昧でないか","リスクと対策が書かれているか"], refs:["iso26514","code","qiita"]},
+  {id:"presup",   label:"③上司レビュー前",      persona:"上司提出前の自己点検として、突っ込まれそうな点を先回りで洗い出す。結論先・数値根拠・実行計画を厳しく確認。",
+   checks:["結論が先に書かれているか","数値に根拠があるか","実行計画（誰がいつ）があるか","想定質問に答えられるか","誤字脱字・体裁が整っているか"], refs:["koyobun","ms","qiita"]},
+  {id:"newbie",   label:"④新人サポート",        persona:"新人の心理的安全に配慮し、専門用語はやさしく言い換え、次の一歩を具体的に示す。",
+   checks:["分からない箇所を特定できたか","用語をやさしく言い換えたか","良い点を伝えたか","小さな次の一歩を示したか","質問しやすい雰囲気か"], refs:["koyobun","jtca","qiita"]},
+  {id:"customer", label:"⑤お客様",              persona:"お客様の視点で、分かりやすさ・約束しすぎ・誤解の余地・社外に出してよい表現かを点検する。",
+   checks:["専門用語を避けているか","約束しすぎていないか","誤解を生む表現がないか","社外に出してよい情報か","期待値が適切に設定されているか"], refs:["koyobun","kisha","qiita"]},
+  {id:"migration",label:"⑥商用運用・移行",      persona:"PoCから本番への移行を見据え、性能・可用性・運用・セキュリティ・コスト・移行手順の懸念を洗い出す。",
+   checks:["性能・スケールの想定があるか","運用・監視の設計があるか","セキュリティ・権限の考慮があるか","コスト・課金の見通しがあるか","移行・撤退の手順があるか"], refs:["iso42001","prod","rag"]},
+  {id:"custom",   label:"⑦その他（自由設定）",  persona:"",
+   checks:["自由観点1","自由観点2","自由観点3"], refs:["qiita"]},
+  {id:"consult",  label:"⑧コンサル",            persona:"経営・事業の視点で論点を構造化（前提・結論・根拠・打ち手）。費用対効果と意思決定に資する助言を、和のみやびで論理的に述べる。",
+   checks:["前提が明確か","結論（提言）が明確か","根拠とデータが揃っているか","打ち手と効果が結びつくか","費用対効果・意思決定に資するか"], refs:["prod","ms","qiita"]},
+  {id:"pbr",      label:"⑨多観点（PBR）",        persona:"複数の立場（作る人・使う人・運用する人・お客様・セキュリティ）から順に読み、立場ごとの気づきを統合する（Perspective-Based Reading）。立場を変えると欠陥の発見が増える。",
+   checks:["作る人視点（実装の妥当性）","使う人視点（分かりやすさ）","運用視点（運用・監視）","お客様視点（誤解・約束）","セキュリティ視点（取り扱い・権限）"], refs:["pbr","fagan","thelin","qiita"]}
+];
+const reviewState={ mode:"gentle", sec:{a:false,b:false,c:false}, text:"", custom:"", result:"", refine:false, iters:1, swap:false };
+const RCFG_KEY="aipoc_review_cfg_v1";
+const reviewCfgDefaults={scaleMax:5, meter:"dial", defWeight:1, alertBelow:3, diffFlag:2, lowAt:3, swapFlag:2};
+let reviewCfg=Object.assign({}, reviewCfgDefaults);
+function rvCfgClamp(){ reviewCfg.scaleMax=Math.max(3,Math.min(10,+reviewCfg.scaleMax||5)); reviewCfg.alertBelow=Math.max(1,Math.min(reviewCfg.scaleMax,+reviewCfg.alertBelow||3)); reviewCfg.diffFlag=Math.max(1,Math.min(reviewCfg.scaleMax,+reviewCfg.diffFlag||2)); reviewCfg.lowAt=Math.max(1,Math.min(reviewCfg.scaleMax,+reviewCfg.lowAt||3)); reviewCfg.swapFlag=Math.max(1,Math.min(reviewCfg.scaleMax,+reviewCfg.swapFlag||2)); reviewCfg.defWeight=Math.max(1,Math.min(3,+reviewCfg.defWeight||1)); if(reviewCfg.meter!=="manual") reviewCfg.meter="dial"; }
+try{ const sv=lsGet(RCFG_KEY); if(sv){ Object.assign(reviewCfg, JSON.parse(sv)); } }catch(_){ }
+rvCfgClamp();
+function cfgPersist(){ try{ lsSet(RCFG_KEY, JSON.stringify(reviewCfg)); }catch(_){ } }
+function applyReviewCfg(){ const v=id=>{const e=document.getElementById(id);return e?e.value:undefined;}; reviewCfg.scaleMax=+v("rvcfgScale"); reviewCfg.meter=v("rvcfgMeter"); reviewCfg.defWeight=+v("rvcfgWeight"); reviewCfg.alertBelow=+v("rvcfgAlert"); reviewCfg.diffFlag=+v("rvcfgDiff"); reviewCfg.lowAt=+v("rvcfgLow"); reviewCfg.swapFlag=+v("rvcfgSwap"); rvCfgClamp(); cfgPersist(); render(); toast("レビュー設定を適用しました"); }
+function resetReviewCfg(){ reviewCfg=Object.assign({}, reviewCfgDefaults); cfgPersist(); render(); toast("レビュー設定を既定に戻しました"); }
+function downloadReviewCfg(){ dl("レビュー設定.json", JSON.stringify(reviewCfg,null,2), "application/json"); toast("設定を書き出しました"); }
+function importReviewCfg(input){ const f=input&&input.files&&input.files[0]; if(!f) return; const rd=new FileReader(); rd.onload=()=>{ try{ const o=JSON.parse(rd.result); Object.assign(reviewCfg, o); rvCfgClamp(); cfgPersist(); render(); toast("設定を読み込みました"); }catch(e){ toast("設定の読み込みに失敗しました", true); } }; rd.readAsText(f); }
+function rvToggleCfg(){ const b=document.getElementById("rvCfgBox"); if(b) b.style.display = (b.style.display==="none"?"block":"none"); }
+function rvDial(btn,dir){ const wrap=btn.parentNode; const h=wrap.querySelector(".rv-score"); const disp=wrap.querySelector(".rv-dial-v"); const SM=reviewCfg.scaleMax; let val=+h.value||1; val=((val-1+dir+SM)%SM)+1; h.value=String(val); if(disp) disp.textContent=String(val); reviewScore(); }
+function reviewMode(){ return REVIEW_MODES.find(m=>m.id===reviewState.mode)||REVIEW_MODES[0]; }
+function kaizenFor(name){
+  const rules=[
+    [/根拠|数値|データ/, "出典・数値の根拠を明記し、曖昧な箇所は《要確認》にする"],
+    [/抜け漏れ|矛盾|対応/, "要件↔設計をチェックリストで突合し、欠け・食い違いを洗い出す"],
+    [/異常系|例外|リスク/, "異常系・リスクと対策を表で整理して追記する"],
+    [/用語|やさしく|説明/, "専門用語を平易に言い換え、初出に短い説明を添える"],
+    [/結論|先に/, "結論（提言）を冒頭に置き、理由は後段にまとめる"],
+    [/実行計画|誰がいつ/, "担当・期限・順序を明記した実行計画を添える"],
+    [/セキュリティ|権限/, "データ取り扱い・権限・送信可否を明記する"],
+    [/コスト|費用|課金/, "コスト試算と回収目安を添える"],
+    [/性能|スケール/, "想定件数・応答時間など性能の前提を書く"],
+    [/運用|監視/, "監視項目・しきい値・障害時の動きを定義する"],
+    [/移行|撤退/, "移行手順と撤退条件を明文化する"],
+    [/誤字|体裁/, "表記ゆれ・誤字をtextlint等で点検し体裁を整える"],
+    [/約束|誤解|社外|期待値/, "約束しすぎを避け、誤解を生む表現を平易に直す"],
+    [/良い点|次の一歩|雰囲気|安心|図|流れ/, "良い点を1つ言語化し、次の小さな一歩を具体化する"]
+  ];
+  for(const [re,a] of rules){ if(re.test(name)) return a; }
+  return "理由を踏まえ、この観点を満たす具体策を1つ決めて反映する";
+}
+function reviewPanelHtml(){
+  const m=reviewMode();
+  const opts=REVIEW_MODES.map(x=>`<option value="${x.id}"${reviewState.mode===x.id?" selected":""}>${x.label}</option>`).join("");
+  const srcOpts=(state.generated?DOCS.filter(d=>d.id!=="docreview"&&state.generated[d.id]):[]).map(d=>`<option value="${d.id}">${esc(d.kno+" "+d.name)}</option>`).join("");
+  const SM=reviewCfg.scaleMax, mid=Math.ceil(SM/2);
+  const scoreInput=(t)=> reviewCfg.meter==="manual"
+    ? `<select class="rv-score" onchange="reviewScore()">${Array.from({length:SM},(_,i)=>i+1).map(n=>`<option value="${n}"${n===mid?" selected":""}>${n}</option>`).join("")}</select>`
+    : `<span class="rv-dial"><button type="button" class="rv-dbtn" onclick="rvDial(this,-1)">−</button><input type="hidden" class="rv-score" value="${mid}"><span class="rv-dial-v">${mid}</span><button type="button" class="rv-dbtn" onclick="rvDial(this,1)">＋</button></span>`;
+  const scoreRows=m.checks.map(t=>`<div class="rv-scoreRow" data-t="${esc(t)}"><div class="rv-scoreName">${esc(t)}</div>${scoreInput(t)}<select class="rv-weight" title="重み" onchange="reviewScore()">${[1,2,3].map(w=>`<option value="${w}"${w===reviewCfg.defWeight?" selected":""}>×${w}</option>`).join("")}</select><input class="rv-reason" type="text" placeholder="理由（任意）" oninput="reviewScore()"></div>`).join("");
+  return `<div class="rv-panel">
+    <div class="rv-title">AI設計書レビュー <span class="rv-sub">採点・カイゼン・参考記事つき／和のみやびで論理的</span></div>
+    <div class="rv-warn">🔒 <b>送信前チェック必須。</b> 観点採点はオフラインです。<b>AIレビュー実行</b>は、アーティファクトでは☑だけで可（APIキー不要）、単体HTMLでは下の<b>APIキー</b>が必要。内容の送信可否を必ず確認してください。</div>
+    <div class="rv-cfgbar"><button class="rv-btn2" onclick="rvToggleCfg()">⚙ 事前設定（採点の数値・入力方式・バックアップ）</button></div>
+    <div class="rv-cfgbox" id="rvCfgBox" style="display:none">
+      <div class="rv-cfgrow"><label>採点スケール</label><select id="rvcfgScale">${[5,10].map(x=>`<option value="${x}"${reviewCfg.scaleMax===x?" selected":""}>1〜${x}</option>`).join("")}</select>
+        <label>入力方式</label><select id="rvcfgMeter"><option value="dial"${reviewCfg.meter==="dial"?" selected":""}>くるくる（−＋）</option><option value="manual"${reviewCfg.meter==="manual"?" selected":""}>手動（選択）</option></select>
+        <label>既定の重み</label><select id="rvcfgWeight">${[1,2,3].map(w=>`<option value="${w}"${reviewCfg.defWeight===w?" selected":""}>×${w}</option>`).join("")}</select></div>
+      <div class="rv-cfgrow"><label>要修正しきい値（総合&lt;）</label><input id="rvcfgAlert" type="number" min="1" max="10" value="${reviewCfg.alertBelow}">
+        <label>要協議の差（≥）</label><input id="rvcfgDiff" type="number" min="1" max="10" value="${reviewCfg.diffFlag}">
+        <label>カイゼン対象（≤）</label><input id="rvcfgLow" type="number" min="1" max="10" value="${reviewCfg.lowAt}">
+        <label>位置バイアスの差（≥）</label><input id="rvcfgSwap" type="number" min="1" max="10" value="${reviewCfg.swapFlag}"></div>
+      <div class="rv-cfgrow rv-cfgbtns"><button class="rv-run" onclick="applyReviewCfg()">適用</button><button class="rv-btn2" onclick="resetReviewCfg()">既定に戻す</button><button class="rv-btn2" onclick="downloadReviewCfg()">⬇ 設定を書き出し</button><label class="rv-btn2 rv-imp">⬆ 設定を読み込み<input type="file" accept="application/json,.json" onchange="importReviewCfg(this)" hidden></label></div>
+      <div class="rv-note">設定はこのブラウザに保存され、書き出したJSONでバックアップ・他端末へ移行できます。</div>
+    </div>
+    <div class="rv-row"><label>モード</label><select id="rvMode" onchange="reviewSetMode(this.value)">${opts}</select></div>
+    <div class="rv-row rv-custom" id="rvCustomRow" style="display:${reviewState.mode==="custom"?"flex":"none"}"><label>自由設定</label><input id="rvCustom" type="text" placeholder="観点・口調を自由に（例：性能とコスト重視で厳しく）" value="${esc(reviewState.custom)}" oninput="reviewState.custom=this.value"></div>
+    <div class="rv-row"><label>対象を読込</label><select id="rvSrc">${srcOpts||'<option value="">（生成後に章を選べます）</option>'}</select><button class="rv-btn2" onclick="reviewLoadSource()">章を読み込む</button></div>
+    <textarea id="rvText" class="rv-text" placeholder="レビューしたい設計書・文章を貼り付け（または上で章を読み込み）" oninput="reviewState.text=this.value;updateReviewBtn()">${esc(reviewState.text)}</textarea>
+    <div class="rv-sub2">▼ 観点を5段階で採点（5=良い）＋理由 — チェックだけでオフライン・レビュー</div>
+    <div class="rv-scores">${scoreRows}</div>
+    <div class="rv-scoreBox" id="rvScore"></div>
+    <div class="rv-sub2">▼ 外部AIに渡す場合の安全確認（必須）</div>
+    <div class="rv-sec">
+      <label><input type="checkbox" id="rvA" ${reviewState.sec.a?"checked":""} onchange="reviewSec('a',this.checked)"> 外部AIに渡してよい内容か、社内規程・お客様との取り決めを確認した</label>
+      <label><input type="checkbox" id="rvB" ${reviewState.sec.b?"checked":""} onchange="reviewSec('b',this.checked)"> 機密・個人情報・図番等の固有情報を含まない（または匿名化した）</label>
+      <label><input type="checkbox" id="rvC" ${reviewState.sec.c?"checked":""} onchange="reviewSec('c',this.checked)"> 外部AIの利用が許可された環境・アカウントである</label>
+    </div>
+    <div class="rv-row"><label>APIキー</label><input id="rvKey" type="password" placeholder="アーティファクトでは不要（☑だけ）／単体HTMLは入力" value=""></div>
+    <div class="rv-opts">
+      <label class="rv-refine"><input type="checkbox" id="rvRefine" ${reviewState.refine?"checked":""} onchange="reviewState.refine=this.checked"> 二段レビュー（指摘→自己反論→改善・Self-Refine）</label>
+      <label class="rv-refine">反復 <select id="rvIters" onchange="reviewState.iters=+this.value">${[1,2,3].map(i=>`<option value="${i}"${(reviewState.iters||1)===i?" selected":""}>${i}回</option>`).join("")}</select></label>
+      <label class="rv-refine"><input type="checkbox" id="rvSwap" ${reviewState.swap?"checked":""} onchange="reviewState.swap=this.checked"> 順序入替の二重採点（位置バイアス点検）</label>
+    </div>
+    <div class="rv-actions">
+      <button id="rvRun" class="rv-run" onclick="reviewRunAI()">AIでレビュー実行</button>
+      <button id="rvCopy" class="rv-btn2" onclick="reviewCopyPrompt()">プロンプトをコピー</button>
+      <button class="rv-btn2" onclick="reviewCopyFeedback()">採点フィードバックをコピー</button>
+      <button class="rv-btn2" onclick="reviewClear()">クリア</button>
+      <span class="rv-hint" id="rvHint"></span>
+    </div>
+    <div class="rv-diff" id="rvDiff"></div>
+    <div class="rv-result" id="rvResult">${reviewState.result?mdToHtml(reviewState.result,"docreview"):'<div class="rv-empty">採点はすぐ反映されます。AIレビューは安全確認に同意のうえ「AIでレビュー実行」、または「プロンプトをコピー」して自分のAIへ。</div>'}</div>
+  </div>`;
+}
+function reviewSetMode(v){ reviewState.mode=v; render(); }
+function reviewSec(k,c){ reviewState.sec[k]=c; updateReviewBtn(); }
+function reviewLoadSource(){
+  const sel=document.getElementById("rvSrc"); const id=sel&&sel.value;
+  if(!id||!state.generated||!state.generated[id]){ toast("読み込める章がありません（先に生成してください）", true); return; }
+  reviewState.text=docMd(id); const ta=document.getElementById("rvText"); if(ta) ta.value=reviewState.text;
+  updateReviewBtn(); toast("対象を読み込みました");
+}
+function reviewScore(){
+  const host=document.getElementById("rvScore"); if(!host) return;
+  const m=reviewMode(); const rows=[...document.querySelectorAll(".rv-scoreRow")]; const SM=reviewCfg.scaleMax;
+  let wsum=0,wtot=0,low=[];
+  rows.forEach(r=>{ const sc=+r.querySelector(".rv-score").value; const w=+(((r.querySelector(".rv-weight")||{}).value)||1); const name=r.dataset.t; const rsn=(r.querySelector(".rv-reason").value||"").trim(); wsum+=sc*w; wtot+=w; if(sc<=reviewCfg.lowAt) low.push({name,sc,w,rsn}); });
+  const avg=wtot?wsum/wtot:0, a=avg.toFixed(1), pct=Math.round(avg/SM*100);
+  const lvl=pct>=90?"優":pct>=80?"良好":pct>=60?"おおむね良好":pct>=40?"要改善":"要見直し";
+  const alert=avg<reviewCfg.alertBelow?`<div class="rv-alert">⚠ 総合スコアが ${reviewCfg.alertBelow} 未満です。提出前に要修正（重大度「高」が1件でもあれば同様）。</div>`:"";
+  const kaizen=low.length?low.map(x=>`<li><b>${esc(x.name)}</b>（${x.sc}/${SM}${x.w>1?("・重み×"+x.w):""}）${x.rsn?("｜理由: "+esc(x.rsn)):""} → ${esc(kaizenFor(x.name))}</li>`).join(""):`<li>要改善（${reviewCfg.lowAt}以下）の観点はありません。良い状態です。</li>`;
+  const refs=(m.refs||[]).map(k=>`<li>${esc(REF_POOL[k]||k)}</li>`).join("");
+  host.innerHTML=`${alert}<div class="rv-scoreTop">総合スコア（重み付き） <b>${a}/${SM}</b> <span class="rv-lvl">${lvl}</span><span class="rv-bar"><span style="width:${pct}%"></span></span></div>
+    <div class="rv-fbk"><div class="rv-fbk-h">カイゼンアクション（理由を添えて）</div><ul>${kaizen}</ul></div>
+    <div class="rv-fbk"><div class="rv-fbk-h">参考記事（一次情報で確認・捏造しない）</div><ul>${refs}</ul></div>`;
+}
+
+
+function updateReviewBtn(){
+  const secOK=reviewState.sec.a&&reviewState.sec.b&&reviewState.sec.c;
+  const textOK=(reviewState.text||"").trim().length>0;
+  const run=document.getElementById("rvRun"), cp=document.getElementById("rvCopy");
+  if(run) run.disabled=!(secOK&&textOK);
+  if(cp) cp.disabled=!(secOK&&textOK);
+  const hint=document.getElementById("rvHint");
+  if(hint) hint.textContent = !textOK?"※ 対象の文章を入れてください" : !secOK?"※ 3つの安全確認に同意してください" : "送信準備OK（アーティファクトはキー不要）";
+}
+function gatherScores(){
+  return [...document.querySelectorAll(".rv-scoreRow")].map(r=>{ const rsn=(r.querySelector(".rv-reason").value||"").trim(); const w=(r.querySelector(".rv-weight")||{}).value||"1"; return `${r.dataset.t}=${r.querySelector(".rv-score").value}/5×${w}${rsn?("（"+rsn+"）"):""}`; }).join("; ");
+}
+function selfScoreMap(){
+  const m={}; [...document.querySelectorAll(".rv-scoreRow")].forEach(r=>{ m[r.dataset.t]={score:+r.querySelector(".rv-score").value, weight:+(((r.querySelector(".rv-weight")||{}).value)||1)}; }); return m;
+}
+
+function reviewBuildPrompt(){
+  const m=reviewMode();
+  const persona=reviewState.mode==="custom"?(reviewState.custom||"中立的な視点でレビューする。"):m.persona;
+  const refs=(m.refs||[]).map(k=>REF_POOL[k]).filter(Boolean).join(" / ");
+  const sc=gatherScores();
+  const crit=(m.checks||[]).join(" / ");
+  const SM=reviewCfg.scaleMax;
+  const iters=Math.max(1,Math.min(3,reviewState.iters||1));
+  const refine=reviewState.refine?("進め方（Self-Refine, 最大"+iters+"回）: ①指摘のみを列挙 → ②各指摘に自分で反論し妥当なものだけ残す → ③最終版を出力。改善が止まれば打ち切り、各回の主な変更を ## 改善ログ に1行ずつ残す。\n"):"";
+  const pbr=reviewState.mode==="pbr"?"PBRの進め方: 各視点で個別に指摘を作り、重複を統合してから観点横断でまとめる（統合結果を出力、個別リストは省略可）。\n":"";
+  return "あなたは和の作法を重んじる、みやびで論理的なレビュアーです。事実と所感を分け、根拠を示し、捏造をしません。不明点は《》で残します。\n"
+    + "レビューの姿勢: "+persona+"\n"
+    + pbr + refine
+    + "重大度の定義: 高＝本番停止級／中＝手戻り発生／低＝軽微。\n"
+    + "各指摘には対象の該当箇所（行番号・項番・見出し等）を必ず併記し、特定できなければ《要確認》とする（根拠の所在を明示）。\n"
+    + "次の構成のMarkdown和文で講評してください（前置き不要）: ## 採点（観点ごとに1〜"+SM+"と根拠。ルーブリックに従い、冗長さや体裁の良さに引きずられない）/ ## 総評 / ## よい点 / ## 気になる点（各項目に重大度［高/中/低］・理由・該当箇所）/ ## カイゼンアクション（理由を添えた具体策）/ ## 参考記事（1〜3件。著名・一次情報を優先、曖昧なら《要確認》、捏造しない）/ ## 確認したいこと。\n"
+    + "採点はLLM評価のバイアス（位置・冗長・自己優遇）に留意し、最終判断は人が行う前提で記す。\n"
+    + "対象観点: "+crit+"\n"
+    + "末尾に解析用の1行を必ず付ける（全観点・観点名はそのまま）: @@SCORES: 観点名=点(1〜"+SM+"); 観点名=点; ... @@\n"
+    + (refs?("参考候補（必要に応じて）: "+refs+"\n"):"")
+    + (sc?("自己採点: "+sc+"\n"):"")
+    + "\n--- レビュー対象 ---\n"+(reviewState.text||"");
+}
+
+
+async function callClaudeReview(text, c, key){
+  const sys=reviewBuildPrompt().split("\n--- レビュー対象 ---\n")[0];
+  const user="案件: "+(c.project||"未記入")+" / 課題: "+c.cat+"\n\n--- レビュー対象 ---\n"+text;
+  const headers={"Content-Type":"application/json","anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"};
+  if(key) headers["x-api-key"]=key;
+  const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers,body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1024,system:sys,messages:[{role:"user",content:user}]})});
+  if(!res.ok) throw new Error("API "+res.status);
+  const data=await res.json();
+  const t=(data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("\n").trim();
+  return t.replace(/^```[a-z]*\n?/,"").replace(/```$/,"").trim();
+}
+function parseAiScores(text){
+  const m=/@@SCORES:\s*([\s\S]*?)@@/.exec(text||""); if(!m) return null;
+  const map={}; m[1].split(/[;\n]/).forEach(p=>{ const mm=/^\s*(.+?)\s*=\s*(\d{1,2})\s*$/.exec(p.replace(/\(.*?\)/g,"").trim()); if(mm){ const v=+mm[2]; if(v>=1&&v<=reviewCfg.scaleMax) map[mm[1].trim()]=v; } }); return Object.keys(map).length?map:null;
+}
+function stripScores(text){ return (text||"").replace(/@@SCORES:[\s\S]*?@@/g,"").trim(); }
+function buildScorePrompt(order){
+  const m=reviewMode(); let crit=(m.checks||[]).slice(); if(order==="rev") crit=crit.reverse();
+  return "次の設計書を観点ごとに1〜"+reviewCfg.scaleMax+"で採点し、解析用の1行だけを返してください（説明不要）。\n対象観点（この順で）: "+crit.join(" / ")+"\n出力: @@SCORES: 観点名=点; ... @@\n\n--- 対象 ---\n"+(reviewState.text||"");
+}
+async function callScoresOnly(order,key){
+  const sys=buildScorePrompt(order).split("\n--- 対象 ---\n")[0];
+  const user="--- 対象 ---\n"+(reviewState.text||"");
+  const headers={"Content-Type":"application/json","anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"};
+  if(key) headers["x-api-key"]=key;
+  const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers,body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:256,system:sys,messages:[{role:"user",content:user}]})});
+  if(!res.ok) throw new Error("API "+res.status);
+  const data=await res.json(); const t=(data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("\n");
+  return parseAiScores(t);
+}
+function reviewDiffHtml(aiScores){
+  const self=selfScoreMap(); const names=Object.keys(self);
+  if(!aiScores) return '<div class="rv-note">AI採点（@@SCORES）を取得できず、自己採点との差分は表示できません。</div>';
+  let rows="", flagged=0;
+  names.forEach(nm=>{ const s=self[nm].score; let a=aiScores[nm];
+    if(a==null){ const k=Object.keys(aiScores).find(x=>x.includes(nm)||nm.includes(x)); if(k) a=aiScores[k]; }
+    const diff=(a==null)?"—":Math.abs(s-a); const flag=(a!=null&&Math.abs(s-a)>=reviewCfg.diffFlag); if(flag) flagged++;
+    rows+=`<tr class="${flag?"rv-flag":""}"><td>${esc(nm)}</td><td>${s}</td><td>${a==null?"—":a}</td><td>${diff}</td><td>${flag?"要協議":""}</td></tr>`; });
+  return `<div class="rv-fbk-h">自己採点 × AI採点（差≥${reviewCfg.diffFlag}は要協議）</div><table class="rv-diff-t"><tr><th>観点</th><th>自己</th><th>AI</th><th>差</th><th>判定</th></tr>${rows}</table>${flagged?`<div class="rv-note">乖離の大きい観点が ${flagged} 件。背景を擦り合わせましょう。</div>`:""}`;
+}
+async function reviewRunAI(){
+  if(!(reviewState.sec.a&&reviewState.sec.b&&reviewState.sec.c)){ toast("3つの安全確認に同意してください", true); return; }
+  const text=(reviewState.text||"").trim(); if(!text){ toast("レビュー対象の文章を入れてください", true); return; }
+  const key=((document.getElementById("rvKey")||{}).value||"").trim() || (typeof apiKeyEl!=="undefined"&&apiKeyEl?apiKeyEl.value.trim():"");
+  const btn=document.getElementById("rvRun"), res=document.getElementById("rvResult"), diff=document.getElementById("rvDiff");
+  const old=btn.textContent; btn.disabled=true; btn.textContent="レビュー中…";
+  if(res) res.innerHTML='<div class="rv-empty">レビューしています…（数十秒かかることがあります）</div>';
+  if(diff) diff.innerHTML="";
+  try{
+    const raw=await callClaudeReview(text, ctx(), key);
+    const aiScores=parseAiScores(raw);
+    const body=stripScores(raw)||"（結果が空でした）";
+    reviewState.result=body;
+    const highN=(body.match(/［高］|\[高\]/g)||[]).length;
+    const sm=selfScoreMap(); let ws=0,wt=0; Object.values(sm).forEach(v=>{ws+=v.score*v.weight;wt+=v.weight;}); const selfAvg=wt?ws/wt:0;
+    let alert="";
+    if(highN>0||selfAvg<reviewCfg.alertBelow){ const parts=[]; if(highN>0) parts.push("重大度「高」"+highN+"件"); if(selfAvg<3) parts.push("自己採点の総合<3"); alert=`<div class="rv-alert">⚠ 提出前に要修正：${parts.join(" / ")}。</div>`; }
+    let bias="";
+    if(reviewState.swap){
+      try{
+        const s1=aiScores||await callScoresOnly("norm",key);
+        const s2=await callScoresOnly("rev",key);
+        if(s1&&s2){ let mx=0; Object.keys(s1).forEach(k=>{ if(s2[k]!=null) mx=Math.max(mx,Math.abs(s1[k]-s2[k])); });
+          bias=`<div class="rv-note">順序入替の二重採点：観点スコアの最大差 ${mx}。${mx>=reviewCfg.swapFlag?"⚠ 位置／順序バイアスの可能性（Zheng 2023）。人の確認を。":"大きな差はありません。"}</div>`;
+        } else { bias='<div class="rv-note">順序入替の二重採点：スコアを解析できませんでした。</div>'; }
+      }catch(e){ bias='<div class="rv-note">順序入替の二重採点に失敗しました。</div>'; }
+    }
+    if(diff) diff.innerHTML = alert + reviewDiffHtml(aiScores) + bias;
+    if(res) res.innerHTML=mdToHtml(reviewState.result,"docreview");
+    toast("AIレビューが完了しました");
+  }catch(e){
+    if(res) res.innerHTML='<div class="rv-empty">AIレビューを実行できませんでした。<br>アーティファクト外では APIキーが必要です（このパネルのAPIキー欄に入力）。<br>または「プロンプトをコピー」してご自身のAIへ。</div>';
+    toast("AIレビュー失敗："+(e.message||e), true); logErr("reviewAI: "+(e.message||e));
+  }finally{ btn.disabled=false; btn.textContent=old; updateReviewBtn(); }
+}
+
+function reviewCopyPrompt(){
+  if(!(reviewState.sec.a&&reviewState.sec.b&&reviewState.sec.c)){ toast("3つの安全確認に同意してください", true); return; }
+  if(!(reviewState.text||"").trim()){ toast("レビュー対象の文章を入れてください", true); return; }
+  const txt=reviewBuildPrompt();
+  navigator.clipboard.writeText(txt).then(()=>toast("レビュー用プロンプトをコピーしました（自分のAIへ）"),()=>{ dl("レビュー用プロンプト.txt",txt,"text/plain"); toast("コピー不可のため .txt で保存しました"); });
+}
+function reviewCopyFeedback(){
+  const m=reviewMode(); const rows=[...document.querySelectorAll(".rv-scoreRow")];
+  let sum=0,n=0,lines=[],low=[];
+  rows.forEach(r=>{ const sc=+r.querySelector(".rv-score").value; const name=r.dataset.t; const rsn=(r.querySelector(".rv-reason").value||"").trim(); sum+=sc;n++; lines.push("・"+name+"："+sc+"/5"+(rsn?("／理由: "+rsn):"")); if(sc<=3) low.push("・"+name+"（"+sc+"/5）→ "+kaizenFor(name)+(rsn?("（理由: "+rsn+"）"):"")); });
+  const avg=n?(sum/n).toFixed(1):"0";
+  const refs=(m.refs||[]).map(k=>"・"+(REF_POOL[k]||k)).join("\n");
+  const txt="■ レビュー採点（"+m.label+"）\n総合: "+avg+"/5\n\n[観点別]\n"+lines.join("\n")+"\n\n[カイゼンアクション（理由つき）]\n"+(low.length?low.join("\n"):"（要改善の観点なし）")+"\n\n[参考記事]\n"+refs+"\n";
+  navigator.clipboard.writeText(txt).then(()=>toast("採点フィードバックをコピーしました"),()=>{ dl("レビュー採点フィードバック.txt",txt,"text/plain"); toast("コピー不可のため .txt で保存しました"); });
+}
+function reviewClear(){ reviewState.text=""; reviewState.result=""; reviewState.sec={a:false,b:false,c:false}; render(); toast("レビュー入力をクリアしました"); }
+
+function exportOne(fmt){
+  if(noDoc()) return; closeMenus();
+  const d=DOCS.find(x=>x.id===state.activeTab), md=docMd(d.id);
+  const tag=state.blank?"_ひな型":"";
+  const base=`${projName()}_${docFile(d)}${tag}`;
+  if(fmt==="md") dl(base+".md", md, "text/markdown");
+  else if(fmt==="txt") dl(base+".txt", mdToText(md), "text/plain");
+  else if(fmt==="csv") dl(base+".csv", tablesToCsv(tablesFromMd(md)), "text/csv");
+  else if(fmt==="xlsx") dl(base+".xlsx", buildXlsx(d.id==="wbs"? buildWbsSheets(ctx()) : tablesFromMd(md).map(t=>({name:t.title,headers:t.headers,rows:t.rows}))), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+  else if(fmt==="docx") dl(base+".docx", buildDocx(md,{project:projDisplay(),docName:d.name+(state.blank?"（記入用ひな型）":"")}), "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+  toast(d.name+" を "+fmt.toUpperCase()+(state.blank?"（ひな型）":"")+" で保存しました");
+}
+
+/* ---- 全章 ---- */
+function allMd(){ return DOCS.map(d=>docMd(d.id)).join("\n\n\n---\n\n\n"); }
+function allTxt(){ return DOCS.map(d=>mdToText(docMd(d.id))).join("\n\n====================\n\n"); }
+function allCsv(){
+  let out="\uFEFF";
+  DOCS.forEach((d,i)=>{
+    if(i) out+="\n";
+    out+="######## "+d.no+" "+d.name+" ########\n";
+    const t=tablesFromMd(docMd(d.id));
+    out+= t.length ? tablesToCsv(t).replace(/^\uFEFF/,"") : "（表なし）\n";
+  });
+  return out;
+}
+function allSheets(){
+  const sheets=[];
+  DOCS.forEach(d=>{
+    if(d.id==="wbs"){ buildWbsSheets(ctx()).forEach(sx=>sheets.push(sx)); return; }
+    const tbs=tablesFromMd(docMd(d.id));
+    if(!tbs.length){ sheets.push({name:d.no+" "+d.name, headers:["（表なし）"], rows:[]}); return; }
+    const rows=[];
+    tbs.forEach(t=>{
+      rows.push(["▼ "+t.title].concat(t.headers));
+      t.rows.forEach(r=> rows.push([""].concat(r)));
+      rows.push([""]);
+    });
+    const maxc=Math.max(7, ...rows.map(r=>r.length));
+    const head=["節 / 区分"]; for(let k=1;k<maxc;k++) head.push("項目"+k);
+    const pad=r=>{ const x=r.slice(); while(x.length<maxc) x.push(""); return x; };
+    sheets.push({name:d.no+" "+d.name, headers:pad(head), rows:rows.map(pad)});
+  });
+  return sheets;
+}
+function exportAll(fmt){
+  if(noDoc()) return; closeMenus();
+  const c=ctx(); const tag=state.blank?"_ひな型":"";
+  const hdr=`<!-- ${c.project||"AI PoC"} ｜ 生成: ${today()} ｜ ${DOCS.length}章${state.blank?" ｜ 白紙ひな型":""} -->\n\n`;
+  const base=projName()+"_一式"+tag;
+  if(fmt==="md") dl(base+".md", hdr+allMd(), "text/markdown");
+  else if(fmt==="txt") dl(base+".txt", allTxt(), "text/plain");
+  else if(fmt==="csv") dl(base+"_全表.csv", allCsv(), "text/csv");
+  else if(fmt==="xlsx") dl(base+"_全表.xlsx", buildXlsx(allSheets()), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+  else if(fmt==="docx") dl(base+".docx", buildDocxMulti(DOCS.map(d=>docMd(d.id)),{project:projDisplay(),docName:"PoC ドキュメント一式（全"+DOCS.length+"章）"+(state.blank?"／記入用":"")}), "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+  toast("全章を "+fmt.toUpperCase()+(state.blank?"（ひな型）":"")+" で保存しました");
+}
+
+function readme(){
+  const c=ctx();
+  return [
+"AI PoC 平安風ドキュメントジェネレーターツールPRO ── 出力一式",
+"==================================================",
+"",
+"案件名      : "+(c.project||"（未記入）"),
+"クライアント: "+(c.client||"（未記入）"),
+"課題カテゴリ: "+c.cat,
+"対象データ  : "+(c.data.join("・")||"（未選択）"),
+"AI機能      : "+(c.feats.join("・")||"（未選択）"),
+"PoC期間     : "+c.term+"  /  精度目標: "+c.acc,
+"想定基盤    : "+(c.llm||"（未記入）"),
+"生成日時    : "+today(),
+"出力モード  : "+(state.blank?"白紙ひな型（記入用の空欄）":"記入済み（叩き台）"),
+"",
+"■ 同梱物",
+"  ・各章 .md / .txt / .docx / .csv（表のある章のみCSV）",
+"  ・"+projName()+"_全文.md / _全文.docx（全"+DOCS.length+"章を連結／Wordは表紙・目次・ヘッダー/フッター付き）",
+"  ・"+projName()+"_全表.xlsx（章ごとにシート分割した表の集約）",
+"",
+"■ Wordについて",
+"  表紙・自動目次・ページ番号・案件名入りです。目次は開いたあと",
+"  右クリック→「フィールド更新」または F9 キーで反映されます。",
+"",
+"■ 取り扱いの注意（重要）",
+"  記入済み版は「叩き台」です。《》で囲まれた箇所は未確定のため、",
+"  関係者と合意のうえ必ず埋めてください。白紙ひな型版は空欄ですので、",
+"  会議の場などでそのまま書き込んでご利用ください。",
+""
+  ].join("\n");
+}
+function exportAllZip(){
+  if(noDoc()) return; closeMenus();
+  try{
+    const tag=state.blank?"_ひな型":"";
+    const files=[];
+    files.push({name:"00_はじめにお読みください.txt", data:readme()});
+    DOCS.forEach(d=>{
+      const md=docMd(d.id), base=docFile(d)+tag;
+      files.push({name:base+".md", data:md});
+      files.push({name:base+".txt", data:mdToText(md)});
+      files.push({name:base+".docx", data:buildDocx(md,{project:projDisplay(),docName:d.name+(state.blank?"（記入用ひな型）":"")})});
+      const t=tablesFromMd(md);
+      if(t.length) files.push({name:base+".csv", data:tablesToCsv(t)});
+    });
+    files.push({name:projName()+"_全文"+tag+".md", data:allMd()});
+    files.push({name:projName()+"_全文"+tag+".docx", data:buildDocxMulti(DOCS.map(d=>docMd(d.id)),{project:projDisplay(),docName:"PoC ドキュメント一式（全"+DOCS.length+"章）"+(state.blank?"／記入用":"")})});
+    files.push({name:projName()+"_全表"+tag+".xlsx", data:buildXlsx(allSheets())});
+    dl(projName()+"_PoC一式"+tag+".zip", zipStore(files), "application/zip");
+    toast("一式（"+files.length+"ファイル"+(state.blank?"・ひな型":"")+"）をZIPで保存しました");
+  }catch(e){ toast("ZIP生成に失敗しました："+(e.message||e), true); }
+}
+
+/* ---- 印刷 / PDF ---- */
+function printDoc(scope){
+  if(noDoc()) return; closeMenus();
+  if(scope==="all"){
+    let host=document.getElementById("printAll");
+    if(!host){ host=document.createElement("div"); host.id="printAll"; document.body.appendChild(host); }
+    host.innerHTML = DOCS.map(d=>`<div class="sheet print-sheet"><div class="sheet-pad"><div class="md">${mdToHtml(docMd(d.id), d.id)}</div></div></div>`).join("");
+    document.body.classList.add("printing-all");
+    window.print();
+    setTimeout(()=>{ document.body.classList.remove("printing-all"); host.innerHTML=""; }, 700);
+  }else{
+    window.print();
+  }
+}
+
+/* ---- メニュー / 木札 ---- */
+function toggleMenu(id){ const m=document.getElementById(id), open=m.classList.contains("open"); closeMenus(); if(!open) m.classList.add("open"); }
+function closeMenus(){ document.querySelectorAll(".menu.open").forEach(m=>m.classList.remove("open")); }
+document.addEventListener("click",e=>{ if(!e.target.closest(".menu")) closeMenus(); });
+function toggleKifuda(on){ document.getElementById("kifudaOv").classList.toggle("open", on); }
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ toggleKifuda(false); closeMenus(); } });
+
+
+let toastTimer;
+function toast(msg, err){
+  if(err && typeof logEvent==="function") try{ logEvent("ERROR", msg); }catch(_){}
+  const t=document.getElementById("toast");
+  t.textContent=msg; t.className="toast show"+(err?" err":"");
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.className="toast"+(err?" err":""),2600);
+}
+
+/* ════════════════════════ 起動 ════════════════════════ */
+buildAllChips();
+buildTabs();
+render();
+["f_project","f_client","f_pain","f_term","f_acc","f_llm"].forEach(id=>{ const el=document.getElementById(id); if(el){ el.addEventListener("input",autosave); el.addEventListener("change",autosave); } });
+function yukiUsagiSometimes(){ try{ if(Math.random()<0.45){ const e=document.getElementById("yukiUsagi"); if(e) e.classList.add("show"); } }catch(_){ } }
+function usagiBoing(){ try{ const e=document.getElementById("yukiUsagi"); if(!e||!e.classList.contains("show")) return; e.classList.remove("boing"); void e.offsetWidth; e.classList.add("boing"); setTimeout(()=>e.classList.remove("boing"),620); }catch(_){ } }
+bootDraft();
+yukiUsagiSometimes();
+</script>
+</body>
+</html>
